@@ -1,0 +1,381 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+/* =========================================
+   ADMISSION FORM
+========================================= */
+
+.af {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  padding: 6px 10px 8px;
+  box-sizing: border-box;
+  display: block !important;
+  text-align: left;
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+  color: #3f4c63;
+}
+
+.af input,
+.af select,
+.af button {
+  font-family: inherit;
+}
+.af-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px 8px;
+  width: 100%;
+}
+
+.af-field {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.af-field input,
+.af-field select {
+  width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+  border: 1px solid #dde3ec;
+  border-radius: 5px;
+  padding: 0 8px;
+  font-size: 11px;
+  font-weight: 400;
+  font-family: inherit;
+  background: #fdfdfe;
+  color: #3f4c63;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.af-field select {
+  cursor: pointer;
+}
+
+.af-field input[type="date"] {
+  color: #3f4c63;
+  cursor: pointer;
+}
+
+.af-field input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.af-field input[type="number"]::-webkit-outer-spin-button,
+.af-field input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.af-field input[type="file"] {
+  height: 30px;
+  padding: 4px 6px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.af-field input::placeholder {
+  color: #a8b3c4;
+  font-weight: 400;
+}
+
+.af-field input:focus,
+.af-field select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.06);
+  background: #fff;
+}
+
+/* =========================================
+   FLOATING LABEL
+========================================= */
+
+.af-label {
+  position: absolute;
+  z-index: 2;
+  top: -5px;
+  left: 7px;
+  background: #fff;
+  padding: 0 3px;
+  font-size: 9px;
+  line-height: 11px;
+  font-weight: 500;
+  color: #5c6b83;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.af-label em {
+  color: #ef4444;
+  font-style: normal;
+  font-weight: 600;
+  margin-left: 2px;
+}
+
+/* =========================================
+   PAYMENT STATUS
+========================================= */
+
+.af-status {
+  width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border: 1px solid #dde3ec;
+  border-radius: 5px;
+  background: #fdfdfe;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.af-status.pending {
+  color: #dc2626;
+  background: #fff7f7;
+  border-color: #fecaca;
+}
+
+.af-status.partial {
+  color: #d97706;
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.af-status.paid {
+  color: #15803d;
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.af-status.empty {
+  color: #a8b3c4;
+  background: #f8fafc;
+  font-weight: 400;
+}
+
+/* =========================================
+   PAYMENT REFERENCE
+========================================= */
+
+.af-payment-note {
+  width: 100%;
+  height: 30px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  border: 1px dashed #d8dee8;
+  border-radius: 5px;
+  background: #f8fafc;
+}
+
+.af-payment-note span {
+  font-size: 9px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.af-payment-note strong {
+  font-size: 9px;
+  color: #a8b3c4;
+  font-weight: 400;
+}
+
+/* =========================================
+   GST - BELOW TOTAL AMOUNT
+========================================= */
+
+.af-gst-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  /* 3rd column = Total Amount column */
+  grid-column: 3;
+
+  margin: 0;
+  padding: 0;
+
+  height: 30px;
+  box-sizing: border-box;
+}
+
+.af-gst-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+
+  font-size: 10px;
+  font-weight: 500;
+  color: #475569;
+
+  cursor: pointer;
+  user-select: none;
+
+  margin: 0;
+  padding: 0;
+}
+
+.af-gst-check input {
+  width: 12px;
+  height: 12px;
+
+  margin: 0;
+  padding: 0;
+
+  accent-color: #2563eb;
+  cursor: pointer;
+}
+
+.af-gst-check span {
+  line-height: 1;
+}
+
+/* =========================================
+   GST RATE BADGE
+========================================= */
+
+.af-gst-rate {
+  display: none !important;
+}
+
+/* =========================================
+   GRAND TOTAL
+========================================= */
+
+.af-grand-total-input {
+  font-weight: 600 !important;
+  color: #1d4ed8 !important;
+  background: #f8fbff !important;
+}
+
+/* =========================================
+   SIGNATURE / FILE UPLOADS
+========================================= */
+
+.af-file {
+  position: relative;
+}
+
+.af-file input[type="file"] {
+  border-color: #dde3ec;
+  background: #fdfdfe;
+}
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.af-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 5px;
+  padding-top: 5px;
+
+  border-top: 1px solid #f1f5f9;
+}
+
+.af-save,
+.af-reset {
+  height: 26px;
+  min-width: 56px;
+
+  padding: 0 9px;
+
+  border-radius: 5px;
+
+  font-size: 11px;
+  font-weight: 500;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.af-save {
+  background: #2563eb;
+  color: #fff;
+  border: 1px solid #2563eb;
+}
+
+.af-save:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.af-reset {
+  background: #fff;
+  color: #2563eb;
+  border: 1px solid #bdd3f5;
+}
+
+.af-reset:hover {
+  background: #eff6ff;
+}
+
+.af,
+.af-grid,
+.af-field {
+  max-width: 100%;
+}
+
+.af {
+  overflow-x: hidden;
+}
+
+@media (max-width: 1050px) {
+  .af-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px 7px;
+  }
+
+  .af-gst-row {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 650px) {
+  .af {
+    padding: 6px 8px;
+  }
+
+  .af-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .af-gst-row {
+    justify-content: flex-start;
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .af-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .af-save,
+  .af-reset {
+    width: 100%;
+  }
+}

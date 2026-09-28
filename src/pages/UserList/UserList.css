@@ -1,0 +1,619 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.ul {
+  width: 100%;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+  color: #111827;
+}
+
+/* ================================
+   FILTER CARD
+================================ */
+
+.ul-filter-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 4px 8px;
+  box-sizing: border-box;
+  margin-bottom: 6px;
+}
+
+.ul-filters {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr auto;
+  align-items: end;
+  gap: 6px;
+}
+
+.ul-field {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ul-field label {
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 600;
+  color: #475569;
+}
+
+.ul-field select,
+.ul-search-box input {
+  width: 100%;
+  height: 24px;
+  min-height: 24px;
+  box-sizing: border-box;
+  border: 1px solid #dbe2ea;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #334155;
+  font-family: "Poppins", sans-serif;
+  font-size: 9px;
+  outline: none;
+}
+
+.ul-field select {
+  padding: 0 7px;
+  cursor: pointer;
+}
+
+.ul-search-box {
+  position: relative;
+  width: 100%;
+}
+
+.ul-search-box span {
+  position: absolute;
+  left: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  line-height: 1;
+  color: #64748b;
+  pointer-events: none;
+}
+
+.ul-search-box input {
+  padding: 0 7px 0 24px;
+}
+
+.ul-field select:focus,
+.ul-search-box input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+}
+
+.ul-clear {
+  height: 24px;
+  min-height: 24px;
+  padding: 0 10px;
+  border: 1px solid #dbe2ea;
+  border-radius: 5px;
+  background: #f8fafc;
+  color: #475569;
+  font-family: "Poppins", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ul-clear:hover {
+  background: #f1f5f9;
+}
+
+/* ================================
+   ACTION BAR
+================================ */
+
+.ul-action-bar {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 4px 2px 6px;
+  min-height: 25px;
+  box-sizing: border-box;
+}
+
+.ul-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 0;
+}
+
+/* ================================
+   BUTTONS
+================================ */
+
+.ul-btn {
+  height: 24px;
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  font-family: "Poppins", sans-serif;
+  font-size: 9px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.ul-pdf {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #dc2626;
+}
+
+.ul-pdf:hover {
+  background: #ffe4e6;
+}
+
+.ul-csv {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #059669;
+}
+
+.ul-csv:hover {
+  background: #d1fae5;
+}
+
+/* ================================
+   SUMMARY PILLS
+================================ */
+
+.ul-sum-pills {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.ul-pill {
+  height: 24px;
+  min-height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-sizing: border-box;
+  font-size: 8.5px;
+  line-height: 1;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+
+.ul-pill span {
+  font-weight: 500;
+}
+
+.ul-pill strong {
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+/* Total */
+
+.ul-pill.total {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #475569;
+}
+
+.ul-pill.total strong {
+  color: #2563eb;
+}
+
+/* Deposit */
+
+.ul-pill.deposit {
+  background: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #475569;
+}
+
+.ul-pill.deposit strong {
+  color: #059669;
+}
+
+/* Pending */
+
+.ul-pill.pending {
+  background: #fffbeb;
+  border-color: #fde68a;
+  color: #475569;
+}
+
+.ul-pill.pending strong {
+  color: #d97706;
+}
+
+/* Cancelled */
+
+.ul-pill.cancelled {
+  background: #fff1f2;
+  border-color: #fecdd3;
+  color: #475569;
+}
+
+.ul-pill.cancelled strong {
+  color: #dc2626;
+}
+
+/* Refund */
+
+.ul-pill.refund {
+  background: #f8fafc;
+  border-color: #dce2ea;
+  color: #475569;
+}
+
+.ul-pill.refund strong {
+  color: #64748b;
+}
+
+/* ================================
+   TABLE
+================================ */
+
+.ul-table-card {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.ul-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.ul-table {
+  width: 100%;
+  min-width: 1100px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.ul-table thead th {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 8.5px;
+  font-weight: 600;
+  text-align: left;
+  padding: 5px 4px;
+  line-height: 1.15;
+  white-space: nowrap;
+  border: none;
+}
+
+.ul-table tbody td {
+  padding: 4px 4px;
+  font-size: 8.5px;
+  line-height: 1.2;
+  color: #334155;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ul-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ul-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.ul-empty {
+  height: 45px;
+  text-align: center !important;
+  color: #94a3b8 !important;
+  font-size: 9px !important;
+}
+
+/* ================================
+   USER NO
+================================ */
+
+.ul-user-no {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 8px;
+  font-weight: 600;
+}
+
+/* ================================
+   DATE
+================================ */
+
+.ul-date {
+  color: #64748b !important;
+  font-size: 8px !important;
+}
+
+/* ================================
+   NAME
+================================ */
+
+.ul-name {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* ================================
+   AMOUNT
+================================ */
+
+.ul-amount {
+  color: #059669;
+  font-weight: 600;
+}
+
+/* ================================
+   PAYMENT STATUS
+================================ */
+
+.ul-payment-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ul-payment-status.paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.ul-payment-status.pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.ul-payment-status.partial {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+/* ================================
+   STATUS
+================================ */
+
+.ul-st {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 18px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ul-st.active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.ul-st.inactive {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.ul-st.cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ================================
+   PAGINATION
+================================ */
+
+.ul-pager {
+  width: 100%;
+  min-height: 32px;
+  padding: 4px 7px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #ffffff;
+  border-top: 1px solid #eef2f7;
+}
+
+.ul-page-info {
+  font-size: 8.5px;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.ul-page-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ul-page-controls button {
+  width: 23px;
+  height: 23px;
+  min-width: 23px;
+  border: 1px solid #dbe2ea;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #475569;
+  font-family: "Poppins", sans-serif;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ul-page-controls button:hover:not(:disabled) {
+  background: #f8fafc;
+}
+
+.ul-page-controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ul-pg {
+  min-width: 23px;
+  height: 23px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 8.5px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.ul-page-controls select {
+  height: 23px;
+  border: 1px solid #dbe2ea;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #475569;
+  padding: 0 5px;
+  font-family: "Poppins", sans-serif;
+  font-size: 8px;
+  outline: none;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1200px) {
+  .ul-filters {
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1fr auto;
+  }
+
+  .ul-table {
+    min-width: 1050px;
+  }
+}
+
+@media (max-width: 800px) {
+  .ul-filters {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .ul-search {
+    grid-column: span 2;
+  }
+
+  .ul-clear {
+    width: fit-content;
+  }
+
+  .ul-action-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ul-actions {
+    width: auto;
+  }
+
+  .ul-sum-pills {
+    width: 100%;
+  }
+
+  .ul-pager {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 520px) {
+  .ul {
+    padding: 6px;
+  }
+
+  .ul-filter-card {
+    padding: 5px;
+  }
+
+  .ul-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .ul-search {
+    grid-column: span 1;
+  }
+
+  .ul-clear {
+    width: 100%;
+  }
+
+  .ul-action-bar {
+    gap: 6px;
+  }
+
+  .ul-sum-pills {
+    gap: 4px;
+  }
+
+  .ul-pill {
+    height: 23px;
+    min-height: 23px;
+    padding: 0 7px;
+  }
+
+  .ul-actions {
+    width: auto;
+  }
+
+  .ul-btn {
+    flex: 1;
+  }
+
+  .ul-pager {
+    padding: 5px;
+  }
+
+  .ul-page-controls {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
