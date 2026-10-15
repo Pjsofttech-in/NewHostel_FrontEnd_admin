@@ -45,7 +45,7 @@ form.rf-box,
   display: grid;
   place-items: center;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 10px;
 }
 
@@ -53,11 +53,13 @@ form.rf-box,
   background: #2f7ab8;
   color: #fff;
 }
+
 .rf-step b {
   font-size: 8px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: 0.25px;
 }
+
 .rf-step.on b {
   color: #2f7ab8;
 }
@@ -81,7 +83,7 @@ form.rf-box,
   border: 1px solid #cfd4d9;
   border-radius: 16px;
   text-align: center;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 11.5px;
   padding: 4px 8px;
   margin: 4px 0 6px;
@@ -104,17 +106,24 @@ form.rf-box,
 .rf-grid1 {
   grid-template-columns: minmax(0, 1fr) !important;
 }
+
 .rf-grid2 {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
 }
+
 .rf-grid3 {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr) !important;
 }
+
 .rf-grid4 {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(
-      0,
-      1fr
-    ) !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr) !important;
 }
 
 .rf-person {
@@ -136,10 +145,10 @@ form.rf-box,
 
 .rf-nsa {
   display: grid !important;
-  grid-template-columns: minmax(0, 2.25fr) minmax(110px, 1.05fr) minmax(
-      60px,
-      0.55fr
-    ) !important;
+  grid-template-columns:
+    minmax(0, 2.25fr)
+    minmax(110px, 1.05fr)
+    minmax(60px, 0.55fr) !important;
   gap: 5px;
   width: 100%;
   margin: 0 0 5px;
@@ -151,7 +160,7 @@ form.rf-box,
 .rf-text-field input {
   width: 100% !important;
   max-width: 100% !important;
-  height: 30px !important;
+  height: 36px !important;
   box-sizing: border-box;
   padding: 0 8px !important;
   border: 1px solid #d1d5db !important;
@@ -174,15 +183,17 @@ form.rf-box,
     [type="checkbox"]
   )::placeholder,
 .rf-text-field input::placeholder {
-  color: #9ca3af !important;
-  -webkit-text-fill-color: #9ca3af !important;
+  color: #5f6670 !important;
+  -webkit-text-fill-color: #5f6670 !important;
   opacity: 1 !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
 }
 
 .rf-float-field {
   position: relative;
   width: 100%;
-  height: 30px;
+  height: 36px;
   min-width: 0;
   box-sizing: border-box;
   border: 1px solid #d1d5db;
@@ -201,7 +212,7 @@ form.rf-box,
   padding: 0 4px;
   color: #9ca3af !important;
   font-size: 9px;
-  font-weight: 600;
+  font-weight: 400 !important;
   line-height: 13px;
   white-space: nowrap;
 }
@@ -210,12 +221,13 @@ form.rf-box,
 .rf em {
   color: #e11d48 !important;
   font-style: normal;
+  font-weight: 400 !important;
 }
 
 .rf-float-field select,
 .rf-float-field input[type="date"] {
   width: 100% !important;
-  height: 28px !important;
+  height: 34px !important;
   border: 0 !important;
   outline: none !important;
   box-shadow: none !important;
@@ -224,6 +236,7 @@ form.rf-box,
   -webkit-text-fill-color: #111827 !important;
   color-scheme: light !important;
   font-size: 11px;
+  font-weight: 400 !important;
   padding: 0 8px !important;
   margin: 0 !important;
   border-radius: 7px;
@@ -233,12 +246,13 @@ form.rf-box,
 .rf-radio-field {
   padding: 0 8px;
 }
+
 .rf-radio-field .rf-radios {
   display: flex !important;
   align-items: center;
   gap: 8px;
   width: 100%;
-  height: 28px;
+  height: 34px;
 }
 
 .rf-radio-field .rf-radios label {
@@ -247,45 +261,91 @@ form.rf-box,
   gap: 3px;
   color: #6b7280 !important;
   font-size: 11px;
+  font-weight: 400 !important;
   white-space: nowrap;
 }
 
 .rf-float-field:focus-within {
-  border-color: #2f7ab8;
+  border-color: #42a5f5;
+}
+
+.rf-float-field:focus-within .rf-float-label {
+  padding: 3px 9px;
+  background: #42a5f5;
+  color: #ffffff !important;
+  border-radius: 12px;
+  z-index: 10;
+  font-weight: 400 !important;
+}
+
+.rf-float-field:focus-within .rf-float-label em {
+  color: #ffffff !important;
 }
 
 /* =========================================
-   EMPTY PLACEHOLDER — grey text
-   (Select "Select" / Date "dd-mm-yyyy")
+   EMPTY PLACEHOLDER
 ========================================= */
 
 .rf-float-field.is-empty select,
 .rf-float-field.is-empty input[type="date"] {
-  color: #9ca3af !important;
-  -webkit-text-fill-color: #9ca3af !important;
+  color: #5f6670 !important;
+  -webkit-text-fill-color: #5f6670 !important;
+  font-size: 11px !important;
+  font-weight: 400 !important;
 }
 
 /* =========================================
-   STEP 4 — UNDERTAKING + DEPOSIT
-   labels + SELECTED value BLACK
-   "Select" placeholder GREY
+   UNDERTAKING
 ========================================= */
+
+.rf-dark .rf-grid2,
+.rf-dark .rf-grid3,
+.rf-dark .rf-grid4 {
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.rf-dark .rf-title {
+  margin-bottom: 10px;
+}
+
+.rf-dark .rf-save,
+.rf-dark .rf-reset,
+.rf-dark .rf-next {
+  font-weight: 400;
+}
+
+.rf-dark .rf-sign {
+  min-height: 44px;
+}
+
+.rf-dark .rf-float-field {
+  height: 36px;
+}
+
+.rf-dark .rf-float-field select,
+.rf-dark .rf-float-field input[type="date"] {
+  height: 34px !important;
+}
 
 .rf-dark .rf-float-label,
 .rf-dark-labels .rf-float-label {
-  color: #111827 !important;
+  color: #9ca3af !important;
+  font-weight: 400 !important;
 }
 
 .rf-dark .rf-float-field select,
 .rf-dark-labels .rf-float-field select {
   color: #111827 !important;
   -webkit-text-fill-color: #111827 !important;
+  font-weight: 400 !important;
 }
 
 .rf-dark .rf-float-field.is-empty select,
 .rf-dark-labels .rf-float-field.is-empty select {
-  color: #9ca3af !important;
-  -webkit-text-fill-color: #9ca3af !important;
+  color: #5f6670 !important;
+  -webkit-text-fill-color: #5f6670 !important;
+  font-weight: 400 !important;
 }
 
 .rf-photo {
@@ -323,8 +383,8 @@ form.rf-box,
 
 .rf-sign {
   position: relative;
-  height: 38px;
-  min-height: 38px;
+  height: 44px;
+  min-height: 44px;
   padding: 0 8px;
   overflow: visible;
 }
@@ -338,6 +398,7 @@ form.rf-box,
   border: 0 !important;
   background: transparent !important;
   font-size: 11px !important;
+  font-weight: 400 !important;
   color: #111827 !important;
   padding: 0 !important;
   margin: 0 !important;
@@ -347,12 +408,14 @@ form.rf-box,
   padding: 1px 3px 5px;
   width: 100%;
 }
+
 .rf-vehicle p {
   font-size: 11px;
   margin: 0 0 5px;
   color: #2563eb;
-  font-weight: 600;
+  font-weight: 400;
 }
+
 .vehicle-fields {
   margin-top: 7px;
 }
@@ -362,15 +425,17 @@ form.rf-box,
   align-items: center;
   gap: 12px;
   font-size: 11px;
+  font-weight: 400;
   color: #6b7280;
 }
 
 .rf-agree-text {
   font-size: 11px;
-  line-height: 1.4;
-  margin: 2px 4px 7px;
+  line-height: 1.45;
+  margin: 5px 4px 10px;
   display: block;
-  color: #111827;
+  color: #6b7280;
+  font-weight: 400;
 }
 
 .rf-action-row {
@@ -384,18 +449,20 @@ form.rf-box,
 
 .rf-save,
 .rf-reset {
-  height: 28px;
+  height: 34px;
   padding: 0 9px;
-  font-weight: 600;
+  font-weight: 400;
   border-radius: 4px;
   cursor: pointer;
   font-size: 11px;
 }
+
 .rf-save {
   background: #1d4ed8;
   color: #fff;
   border: 0;
 }
+
 .rf-reset {
   background: #fff;
   color: #1d4ed8;
@@ -422,32 +489,38 @@ form.rf-box,
   height: 26px;
   padding: 0 9px;
   border-radius: 4px;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   font-size: 11px;
 }
+
 .rf-back {
   background: #e5e7eb;
   color: #9ca3af;
   border: 0;
 }
+
 .rf-next {
   background: #fff;
   color: #374151;
   border: 1px solid #d1d5db;
 }
 
+/* =========================================
+   TEXT FIELD / FULL NAME
+========================================= */
+
 .rf-text-field {
   position: relative;
   width: 100%;
   min-width: 0;
-  height: 30px;
+  height: 36px;
   box-sizing: border-box;
 }
 
 .rf-text-field input {
   width: 100% !important;
-  height: 30px !important;
+  height: 36px !important;
   box-sizing: border-box;
   padding: 0 8px !important;
   border: 1px solid #d1d5db !important;
@@ -455,6 +528,7 @@ form.rf-box,
   background: #fff !important;
   color: #111827 !important;
   font-size: 11px !important;
+  font-weight: 400 !important;
   outline: none !important;
 }
 
@@ -467,37 +541,58 @@ form.rf-box,
   display: flex;
   align-items: center;
   background: #fff;
-  padding-right: 3px;
-  color: #9ca3af !important;
+  padding: 0 4px;
+  color: #5f6670 !important;
   font-size: 11px;
+  line-height: 13px;
+  font-weight: 400 !important;
   pointer-events: none;
   white-space: nowrap;
   max-width: calc(100% - 16px);
   overflow: hidden;
   text-overflow: ellipsis;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    padding 0.18s ease,
+    border-radius 0.18s ease,
+    top 0.18s ease,
+    transform 0.18s ease,
+    font-size 0.18s ease;
 }
 
 .rf-text-placeholder em {
   color: #e11d48 !important;
   font-style: normal;
+  font-weight: 400 !important;
 }
 
-.rf-text-field.has-value .rf-text-placeholder,
-.rf-text-field:focus-within .rf-text-placeholder {
-  display: none !important;
+.rf-text-field.has-value .rf-text-placeholder {
+  top: -7px;
+  transform: none;
+  font-size: 9px;
+  line-height: 13px;
+  color: #5f6670 !important;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-weight: 400 !important;
 }
 
-@media (max-width: 800px) {
-  .rf-person {
-    grid-template-columns: 1fr !important;
-  }
-  .rf-nsa,
-  .rf-grid2,
-  .rf-grid3,
-  .rf-grid4,
-  .rf-action-row {
-    grid-template-columns: 1fr !important;
-  }
+.rf-text-field:not(.has-value):focus-within .rf-text-placeholder {
+  top: -7px;
+  transform: none;
+  padding: 3px 9px;
+  background: #42a5f5;
+  color: #ffffff !important;
+  border-radius: 12px;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 400 !important;
+  z-index: 10;
+}
+
+.rf-text-field:not(.has-value):focus-within .rf-text-placeholder em {
+  color: #ffffff !important;
 }
 
 /* =========================================
@@ -526,13 +621,13 @@ form.rf-box,
 
 .rf-inquiry-linked span {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 400;
   color: #64748b;
 }
 
 .rf-inquiry-linked strong {
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 400;
   color: #14532d;
   background: #dcfce7;
   padding: 6px 12px;
@@ -541,6 +636,7 @@ form.rf-box,
 
 .rf-inquiry-linked small {
   font-size: 11px;
+  font-weight: 400;
   color: #64748b;
 }
 
@@ -561,7 +657,7 @@ form.rf-box,
   padding: 7px 13px;
   border-radius: 7px;
   font-size: 11.5px;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   transition: 0.2s ease;
 }
@@ -571,7 +667,7 @@ form.rf-box,
 }
 
 /* =========================================
-   STEP 1 — NAME FIELD PICKER (Inquiry / Direct)
+   STEP 1 — NAME FIELD PICKER
 ========================================= */
 
 .rf-ntf-row {
@@ -590,7 +686,7 @@ form.rf-box,
 .rf-ntf-swap {
   flex-shrink: 0;
   width: 30px;
-  height: 30px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -616,7 +712,7 @@ form.rf-box,
 
 .rf-ntf-pick {
   width: 100%;
-  height: 30px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -627,7 +723,8 @@ form.rf-box,
   padding: 0 9px;
   font-family: inherit;
   font-size: 11px;
-  color: #9ca3af;
+  font-weight: 400;
+  color: #5f6670;
   cursor: pointer;
   text-align: left;
   box-sizing: border-box;
@@ -644,17 +741,19 @@ form.rf-box,
 .rf-ntf-pick em {
   color: #e11d48;
   font-style: normal;
+  font-weight: 400;
 }
 
 .rf-ntf-pick:hover,
 .rf-ntf-pick.on {
-  border-color: #2f7ab8;
+  border-color: #42a5f5;
 }
 
 .rf-ntf-arrow {
   font-style: normal;
   color: #6b7280;
   font-size: 10px;
+  font-weight: 400;
 }
 
 .rf-ntf-menu {
@@ -682,7 +781,7 @@ form.rf-box,
   text-align: left;
   font-family: inherit;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 400;
   color: #111827;
 }
 
@@ -700,14 +799,17 @@ form.rf-box,
 }
 
 /* =========================================
-   PERSONAL + CONTACT — CUSTOM LINE WIDTHS
+   PERSONAL + CONTACT
 ========================================= */
 
 .rf-line1 {
   display: grid !important;
   grid-template-columns:
-    minmax(0, 1.35fr) minmax(84px, 0.7fr) minmax(36px, 0.38fr)
-    minmax(52px, 0.55fr) minmax(0, 1fr) !important;
+    minmax(0, 1.35fr)
+    minmax(84px, 0.7fr)
+    minmax(36px, 0.38fr)
+    minmax(52px, 0.55fr)
+    minmax(0, 1fr) !important;
   gap: 5px;
   width: 100%;
   margin: 0 0 5px;
@@ -717,7 +819,10 @@ form.rf-box,
 
 .rf-line2 {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr) minmax(0, 1.35fr) !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1.05fr)
+    minmax(0, 1.35fr) !important;
   gap: 5px;
   width: 100%;
   margin: 0 0 5px;
@@ -727,7 +832,10 @@ form.rf-box,
 
 .rf-line3 {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    auto !important;
   gap: 5px;
   align-items: center;
   width: 100%;
@@ -737,7 +845,10 @@ form.rf-box,
 
 .rf-ct1 {
   display: grid !important;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) !important;
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(0, 1fr)
+    minmax(0, 1fr) !important;
   gap: 5px;
   width: 100%;
   margin: 0 0 5px;
@@ -747,7 +858,11 @@ form.rf-box,
 
 .rf-ct2 {
   display: grid !important;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr) auto !important;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr)
+    minmax(0, 1.2fr)
+    auto !important;
   gap: 5px;
   align-items: center;
   width: 100%;
@@ -761,6 +876,18 @@ form.rf-box,
 }
 
 @media (max-width: 800px) {
+  .rf-person {
+    grid-template-columns: 1fr !important;
+  }
+
+  .rf-nsa,
+  .rf-grid2,
+  .rf-grid3,
+  .rf-grid4,
+  .rf-action-row {
+    grid-template-columns: 1fr !important;
+  }
+
   .rf-line1,
   .rf-line2,
   .rf-line3,

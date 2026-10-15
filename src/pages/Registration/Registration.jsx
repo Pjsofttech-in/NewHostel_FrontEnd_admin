@@ -100,6 +100,7 @@ const emptyForm = {
   parentSign: "",
   agreeApplicantSign: "",
   agreeParentSign: "",
+  policeVerification: "",
 
   buildingName: "",
   depFloor: "",
@@ -220,7 +221,7 @@ const SelectField = ({
         required={required}
         disabled={disabled}
       >
-        <option value="">Select</option>
+        <option value=""></option>
 
         {options.map((option) => (
           <option key={option} value={option}>
@@ -686,7 +687,7 @@ const RadioField = ({
    SIGNATURE
 ===================================================== */
 
-const SignatureField = ({ name, label, onChange }) => {
+const SignatureField = ({ name, label, onChange, accept = "image/*" }) => {
   return (
     <div className="rf-float-field rf-sign">
       <span className="rf-float-label">
@@ -695,7 +696,7 @@ const SignatureField = ({ name, label, onChange }) => {
 
       <input
         type="file"
-        accept="image/*"
+        accept={accept}
         name={name}
         onChange={onChange}
         className="rf-native-file"
@@ -1092,6 +1093,56 @@ const Registration = ({ onSaved, selectedInquiry }) => {
     }
 
     /* =========================
+       POLICE VERIFICATION REQUIRED
+    ========================= */
+
+    if (!form.policeVerification) {
+      alert("Please upload Police Verification document.");
+
+      setStep(5);
+
+      return;
+    }
+
+    /* =========================
+       BED AVAILABILITY CHECK
+    ========================= */
+
+    let bedConflict = false;
+
+    if (form.bedNumber) {
+      const floorData = loadJson(FLOOR_KEY, []);
+
+      const bedFloor = floorData.find(
+        (f) =>
+          (!form.buildingName || f.building === form.buildingName) &&
+          f.floor === form.depFloor,
+      );
+
+      const bedRoom = (bedFloor?.roomList || []).find(
+        (r) => r.name === form.roomNumber,
+      );
+
+      const bed = (bedRoom?.beds || []).find(
+        (b) => String(b.number) === String(form.bedNumber),
+      );
+
+      if (bed && bed.occupied) {
+        bedConflict = true;
+      }
+    }
+
+    if (bedConflict) {
+      alert(
+        `Bed ${form.bedNumber} is already occupied. Please select another bed.`,
+      );
+
+      setStep(4);
+
+      return;
+    }
+
+    /* =========================
        LOAD REGISTRATION LIST
     ========================= */
 
@@ -1170,6 +1221,60 @@ const Registration = ({ onSaved, selectedInquiry }) => {
     localStorage.setItem(LIST_KEY, JSON.stringify([...list, row]));
 
     localStorage.setItem(SEQ_KEY, String(nextSequence));
+
+    /* =========================
+       OCCUPY BED
+    ========================= */
+
+    if (form.bedNumber) {
+      const floorData = loadJson(FLOOR_KEY, []);
+
+      const updatedFloors = floorData.map((f) => {
+        const isFloor =
+          (!form.buildingName || f.building === form.buildingName) &&
+          f.floor === form.depFloor;
+
+        if (!isFloor) {
+          return f;
+        }
+
+        return {
+          ...f,
+
+          roomList: (f.roomList || []).map((r) => {
+            if (r.name !== form.roomNumber) {
+              return r;
+            }
+
+            return {
+              ...r,
+
+              beds: (r.beds || []).map((b) =>
+                String(b.number) === String(form.bedNumber)
+                  ? {
+                      ...b,
+
+                      occupied: true,
+
+                      occupiedBy: form.fullName || form.applicantName || "-",
+
+                      userNo: nextSequence,
+
+                      admissionId: null,
+                    }
+                  : b,
+              ),
+            };
+          }),
+        };
+      });
+
+      localStorage.setItem(FLOOR_KEY, JSON.stringify(updatedFloors));
+
+      window.dispatchEvent(new Event("hostel-admission-updated"));
+
+      window.dispatchEvent(new Event("hostel-data-updated"));
+    }
 
     /* =========================
        UPDATE INQUIRY — fakt inquiry mode madhe
@@ -1541,19 +1646,11 @@ const Registration = ({ onSaved, selectedInquiry }) => {
 
           <div className="rf-title">Family Details</div>
 
-          <div className="rf-grid3">
+          <div className="rf-grid2">
             <TextField
               name="fatherName"
               label="Father's Full Name"
               value={form.fatherName}
-              onChange={set}
-              required
-            />
-
-            <TextField
-              name="fatherMobile"
-              label="Father's Mobile No"
-              value={form.fatherMobile}
               onChange={set}
               required
             />
@@ -1569,13 +1666,23 @@ const Registration = ({ onSaved, selectedInquiry }) => {
 
           <div className="rf-grid2">
             <TextField
+              name="fatherMobile"
+              label="Father's Mobile No"
+              value={form.fatherMobile}
+              onChange={set}
+              required
+            />
+
+            <TextField
               name="motherMobile"
               label="Mother's Mobile No"
               value={form.motherMobile}
               onChange={set}
               required
             />
+          </div>
 
+          <div className="rf-grid1">
             <TextField
               name="parentAddress"
               label="Parent's Permanent Address"
@@ -1617,6 +1724,7 @@ const Registration = ({ onSaved, selectedInquiry }) => {
               required
             />
           </div>
+
           <SaveReset onSave={saveDraft} onReset={reset} />
 
           <div className="rf-nav">
@@ -2230,6 +2338,15 @@ const Registration = ({ onSaved, selectedInquiry }) => {
             <SignatureField
               name="agreeParentSign"
               label="Parent/Guardian's Signature"
+              onChange={onSign}
+            />
+          </div>
+
+          <div className="rf-grid2">
+            <SignatureField
+              name="policeVerification"
+              label="Police Verification"
+              accept="image/*,.pdf"
               onChange={onSign}
             />
           </div>

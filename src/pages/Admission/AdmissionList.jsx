@@ -1,11 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import {
-  FaSearch,
-  FaChevronLeft,
-  FaChevronRight,
-  FaEdit,
-  FaTrashAlt,
-} from "react-icons/fa";
+import { FaSearch, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Receipt from "./Receipt";
 import AdmissionForm from "./AdmissionForm";
 import "./AdmissionList.css";
@@ -13,6 +7,8 @@ import "./AdmissionList.css";
 const ADM_KEY = "hostel-admissions";
 
 const PAGE_SIZES = [10, 20, 50];
+
+/* ================= LOAD ADMISSIONS ================= */
 
 const loadAdmissions = () => {
   try {
@@ -22,6 +18,8 @@ const loadAdmissions = () => {
     return [];
   }
 };
+
+/* ================= PAGE NUMBERS ================= */
 
 const getPageNumbers = (totalPages, current) => {
   if (totalPages <= 7) {
@@ -47,47 +45,41 @@ const getPageNumbers = (totalPages, current) => {
   return result;
 };
 
+/* ================= MONEY ================= */
+
 const money = (v) => {
   const n = Number(v) || 0;
   return `₹ ${n.toLocaleString("en-IN")}`;
 };
 
-/* ============================================
-   DELETE ADMISSION
-============================================ */
+/* ================= ROW TOTAL (new model + legacy) ================= */
 
-const deleteAdmission = (row) => {
-  if (!row) return false;
+const rowTotal = (row) => {
+  const paid = Number(row.amountPaid) || 0;
+  const gstAmt = row.includeGst
+    ? (paid * (Number(row.gstPercent) || 0)) / 100
+    : 0;
 
-  const student = row.studentName || row.userNo || "this admission";
-
-  const confirmed = window.confirm(
-    `Are you sure you want to delete the admission of ${student}?`,
-  );
-
-  if (!confirmed) return false;
-
-  try {
-    const current = loadAdmissions();
-
-    const updated = current.filter((item) => item.id !== row.id);
-
-    localStorage.setItem(ADM_KEY, JSON.stringify(updated));
-
-    window.dispatchEvent(new Event("hostel-admission-updated"));
-
-    window.dispatchEvent(new Event("hostel-data-updated"));
-
-    return true;
-  } catch {
-    alert("Unable to delete admission.");
-    return false;
-  }
+  return Number(row.totalAmount) || Number(row.grandTotal) || paid + gstAmt;
 };
 
-/* ============================================
-   COMPONENT
-============================================ */
+/* ================= DATE HELPERS ================= */
+
+const todayISO = () => {
+  const d = new Date();
+
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+
+const monthShift = (offset) => {
+  const now = new Date();
+
+  const d = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+};
+
+/* ================= ADMISSION LIST ================= */
 
 const AdmissionList = () => {
   const [admissions, setAdmissions] = useState(loadAdmissions);
@@ -96,22 +88,40 @@ const AdmissionList = () => {
   const [buildingFilter, setBuildingFilter] = useState("All");
   const [paymentFilter, setPaymentFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [dateFilter, setDateFilter] = useState("All");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  /* ===== RECEIPT ===== */
+
   const [receiptRow, setReceiptRow] = useState(null);
+
+  /* ===== PAY REMAINING ===== */
 
   const [payRow, setPayRow] = useState(null);
   const [payAmount, setPayAmount] = useState("");
   const [payMode, setPayMode] = useState("Cash");
 
+  /* ===== INSTALLMENT DETAILS ===== */
+
+  const [instRow, setInstRow] = useState(null);
+  const [showInstForm, setShowInstForm] = useState(false);
+  const [newInstAmount, setNewInstAmount] = useState("");
+  const [newInstDueDate, setNewInstDueDate] = useState("");
+  const [newInstRemark, setNewInstRemark] = useState("");
+  const [completingInstId, setCompletingInstId] = useState(null);
+  const [completeInstDate, setCompleteInstDate] = useState(todayISO());
+  const [completeInstMode, setCompleteInstMode] = useState("Cash");
+
+  /* ===== VIEW / EDIT ===== */
+
   const [viewRow, setViewRow] = useState(null);
   const [editRow, setEditRow] = useState(null);
 
-  /* ============================================
-     REFRESH
-  ============================================ */
+  /* ================= REFRESH ================= */
 
   useEffect(() => {
     const refresh = () => {
@@ -121,13 +131,14 @@ const AdmissionList = () => {
     refresh();
 
     window.addEventListener("hostel-admission-updated", refresh);
-
+    window.addEventListener("admission-updated", refresh);
     window.addEventListener("hostel-reg-updated", refresh);
-
     window.addEventListener("storage", refresh);
 
     return () => {
       window.removeEventListener("hostel-admission-updated", refresh);
+
+      window.removeEventListener("admission-updated", refresh);
 
       window.removeEventListener("hostel-reg-updated", refresh);
 
@@ -135,29 +146,66 @@ const AdmissionList = () => {
     };
   }, []);
 
-  /* ============================================
-     RESET PAGE
-  ============================================ */
+  /* ================= FILTER CHANGE ================= */
 
   useEffect(() => {
     setPage(1);
-  }, [search, buildingFilter, paymentFilter, statusFilter, pageSize]);
+  }, [
+    search,
+    buildingFilter,
+    paymentFilter,
+    statusFilter,
+    dateFilter,
+    dateFrom,
+    dateTo,
+    pageSize,
+  ]);
 
-  /* ============================================
-     BUILDING OPTIONS
-  ============================================ */
+  /* ================= BUILDINGS ================= */
 
   const buildingOpts = useMemo(
     () => [...new Set(admissions.map((a) => a.building).filter(Boolean))],
     [admissions],
   );
 
-  /* ============================================
-     FILTER
-  ============================================ */
+  /* ================= FILTER + SEARCH ================= */
 
   const filtered = useMemo(() => {
     const text = search.trim().toLowerCase();
+
+    const matchDate = (d) => {
+      const date = d || "";
+
+      if (dateFilter === "Today") {
+        return date === todayISO();
+      }
+
+      if (dateFilter === "This Month") {
+        return date.slice(0, 7) === monthShift(0);
+      }
+
+      if (dateFilter === "Last Month") {
+        return date.slice(0, 7) === monthShift(-1);
+      }
+
+      if (dateFilter === "Custom") {
+        if (!date) {
+          return false;
+        }
+
+        if (dateFrom && date < dateFrom) {
+          return false;
+        }
+
+        if (dateTo && date > dateTo) {
+          return false;
+        }
+
+        return true;
+      }
+
+      return true;
+    };
 
     return [...admissions].reverse().filter((row) => {
       const matchesSearch =
@@ -190,15 +238,28 @@ const AdmissionList = () => {
       const matchesStatus =
         statusFilter === "All" || (row.status || "Active") === statusFilter;
 
+      const matchesDate = matchDate(row.admissionDate);
+
       return (
-        matchesSearch && matchesBuilding && matchesPayment && matchesStatus
+        matchesSearch &&
+        matchesBuilding &&
+        matchesPayment &&
+        matchesStatus &&
+        matchesDate
       );
     });
-  }, [admissions, search, buildingFilter, paymentFilter, statusFilter]);
+  }, [
+    admissions,
+    search,
+    buildingFilter,
+    paymentFilter,
+    statusFilter,
+    dateFilter,
+    dateFrom,
+    dateTo,
+  ]);
 
-  /* ============================================
-     SUMMARY
-  ============================================ */
+  /* ================= SUMMARY ================= */
 
   const sums = useMemo(() => {
     let paid = 0;
@@ -229,9 +290,7 @@ const AdmissionList = () => {
     };
   }, [filtered]);
 
-  /* ============================================
-     PAGINATION
-  ============================================ */
+  /* ================= PAGINATION ================= */
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
 
@@ -243,20 +302,147 @@ const AdmissionList = () => {
 
   const pageNumbers = getPageNumbers(totalPages, currentPage);
 
-  /* ============================================
-     CLEAR FILTERS
-  ============================================ */
+  /* ===== INSTALLMENT DETAILS (live row) ===== */
+
+  const instLive = instRow
+    ? admissions.find((a) => a.id === instRow.id) || instRow
+    : null;
+
+  const instPaid = Number(instLive?.amountPaid) || 0;
+
+  const instTotal = instLive ? rowTotal(instLive) : 0;
+
+  const instPending = instTotal - instPaid;
+
+  const instPayments = instLive ? instLive.payments || [] : [];
+  const instSchedules = instLive ? instLive.installments || [] : [];
+  const scheduledPending = instSchedules
+    .filter((item) => item.status !== "Completed")
+    .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  const unscheduledPending = Math.max(0, instPending - scheduledPending);
+
+  const persistAdmissionUpdate = (updatedRow) => {
+    const list = loadAdmissions().map((row) =>
+      row.id === updatedRow.id ? updatedRow : row,
+    );
+    localStorage.setItem(ADM_KEY, JSON.stringify(list));
+    setAdmissions(list);
+    setInstRow(updatedRow);
+    window.dispatchEvent(new Event("hostel-admission-updated"));
+    window.dispatchEvent(new Event("admission-updated"));
+  };
+
+  const closeInstallments = () => {
+    setInstRow(null);
+    setShowInstForm(false);
+    setNewInstAmount("");
+    setNewInstDueDate("");
+    setNewInstRemark("");
+    setCompletingInstId(null);
+  };
+
+  const saveNewInstallment = () => {
+    const amount = Number(newInstAmount) || 0;
+    if (amount <= 0) {
+      alert("Please enter a valid installment amount.");
+      return;
+    }
+    if (!newInstDueDate) {
+      alert("Please select a due date.");
+      return;
+    }
+    if (amount > unscheduledPending) {
+      alert(
+        `Installment cannot exceed the unallocated pending amount (${money(unscheduledPending)}).`,
+      );
+      return;
+    }
+
+    const updatedRow = {
+      ...instLive,
+      installments: [
+        ...instSchedules,
+        {
+          id: `inst-${Date.now()}`,
+          amount,
+          dueDate: newInstDueDate,
+          remark: newInstRemark.trim(),
+          status: "Pending",
+          installmentDate: "",
+          paymentMode: "",
+        },
+      ],
+    };
+    persistAdmissionUpdate(updatedRow);
+    setShowInstForm(false);
+    setNewInstAmount("");
+    setNewInstDueDate("");
+    setNewInstRemark("");
+  };
+
+  const saveInstallmentComplete = (item) => {
+    const amount = Number(item?.amount) || 0;
+    if (amount <= 0 || amount > instPending) {
+      alert(
+        "This installment amount is not valid for the current pending balance.",
+      );
+      return;
+    }
+    if (!completeInstDate) {
+      alert("Please select the installment date.");
+      return;
+    }
+
+    const updatedPayments = [
+      ...instPayments,
+      {
+        date: completeInstDate,
+        amount,
+        mode: completeInstMode,
+        remark: item?.remark || "",
+        installmentId: item?.id || null,
+      },
+    ];
+    const newPaid = instPaid + amount;
+    const updatedSchedules = item?.id
+      ? instSchedules.map((schedule) =>
+          schedule.id === item.id
+            ? {
+                ...schedule,
+                status: "Completed",
+                installmentDate: completeInstDate,
+                paymentMode: completeInstMode,
+              }
+            : schedule,
+        )
+      : instSchedules;
+
+    persistAdmissionUpdate({
+      ...instLive,
+      amountPaid: newPaid,
+      paymentMode: completeInstMode,
+      paymentStatus: newPaid >= instTotal ? "Completed" : "Installment",
+      payments: updatedPayments,
+      installments: updatedSchedules,
+    });
+    setCompletingInstId(null);
+    setCompleteInstDate(todayISO());
+    setCompleteInstMode("Cash");
+  };
+
+  /* ================= CLEAR FILTERS ================= */
 
   const clearFilters = () => {
     setSearch("");
     setBuildingFilter("All");
     setPaymentFilter("All");
     setStatusFilter("All");
+    setDateFilter("All");
+    setDateFrom("");
+    setDateTo("");
   };
 
-  /* ============================================
-     CSV
-  ============================================ */
+  /* ================= CSV EXPORT ================= */
 
   const exportCsv = () => {
     if (filtered.length === 0) {
@@ -267,38 +453,42 @@ const AdmissionList = () => {
     const heads = [
       "User No",
       "Date",
-      "Student",
-      "Mobile",
-      "Building",
-      "Floor",
-      "Room",
-      "Bed",
-      "Stay From",
-      "Stay To",
-      "Grand Total",
+      "Name",
+      "Amount",
+      "GST Amt",
+      "Total (+GST)",
       "Paid",
-      "Payment Status",
-      "Mode",
+      "Pending",
+      "Payment Mode",
       "Status",
+      "Due Date",
     ];
 
-    const rows = filtered.map((r) => [
-      r.userNo || "-",
-      r.admissionDate || "-",
-      r.studentName || "-",
-      r.mobile || "-",
-      r.building || "-",
-      r.floor || "-",
-      r.roomNumber || "-",
-      r.bedNumber || "-",
-      r.stayFrom || "-",
-      r.stayTo || "-",
-      Number(r.grandTotal) || 0,
-      Number(r.amountPaid) || 0,
-      r.paymentStatus || "-",
-      r.paymentMode || "-",
-      r.status || "-",
-    ]);
+    const rows = filtered.map((r) => {
+      const paid = Number(r.amountPaid) || 0;
+
+      const gstAmt = r.includeGst
+        ? (paid * (Number(r.gstPercent) || 0)) / 100
+        : 0;
+
+      const total = Number(r.totalAmount) || paid + gstAmt;
+
+      const pending = total - paid;
+
+      return [
+        r.userNo || "-",
+        r.admissionDate || "-",
+        r.studentName || "-",
+        paid,
+        gstAmt,
+        total,
+        paid,
+        pending,
+        r.paymentMode || "-",
+        r.paymentStatus || "-",
+        r.dueDate || "-",
+      ];
+    });
 
     const csv = [heads, ...rows]
       .map((line) => line.map((c) => `"${String(c)}"`).join(","))
@@ -320,26 +510,87 @@ const AdmissionList = () => {
     URL.revokeObjectURL(url);
   };
 
-  /* ============================================
-     PAYMENT
-  ============================================ */
+  /* ================= PAY REMAINING ================= */
 
-  const openPay = (row) => {
-    const remaining =
-      (Number(row.grandTotal) || 0) - (Number(row.amountPaid) || 0);
+  /* ===== DELETE ADMISSION ===== */
+
+  const deleteAdmission = (row) => {
+    if (!window.confirm(`Delete admission of "${row.studentName}"?`)) {
+      return;
+    }
+
+    let list = [];
+
+    try {
+      list = JSON.parse(localStorage.getItem(ADM_KEY) || "[]");
+    } catch {
+      list = [];
+    }
+
+    localStorage.setItem(
+      ADM_KEY,
+      JSON.stringify(list.filter((r) => r.id !== row.id)),
+    );
+
+    let floors = [];
+
+    try {
+      floors = JSON.parse(
+        localStorage.getItem("hostel-admission-floors") || "[]",
+      );
+    } catch {
+      floors = [];
+    }
+
+    const freedFloors = floors.map((floor) => ({
+      ...floor,
+
+      roomList: (floor.roomList || []).map((room) => ({
+        ...room,
+
+        beds: (room.beds || []).map((bed) =>
+          bed.admissionId === row.id
+            ? {
+                ...bed,
+                occupied: false,
+                occupiedBy: null,
+                userNo: null,
+                admissionId: null,
+              }
+            : bed,
+        ),
+      })),
+    }));
+
+    localStorage.setItem(
+      "hostel-admission-floors",
+      JSON.stringify(freedFloors),
+    );
+
+    window.dispatchEvent(new Event("hostel-admission-updated"));
+
+    window.dispatchEvent(new Event("hostel-data-updated"));
+
+    setViewRow(null);
+
+    alert("Admission deleted successfully.");
+  };
+
+  const openPay = (row, prefill) => {
+    const remaining = rowTotal(row) - (Number(row.amountPaid) || 0);
 
     setPayRow(row);
-
-    setPayAmount(String(remaining > 0 ? remaining : ""));
-
+    setPayAmount(
+      prefill !== undefined
+        ? String(prefill)
+        : String(remaining > 0 ? remaining : ""),
+    );
     setPayMode(row.paymentMode || "Cash");
   };
 
   const savePay = () => {
-    const total = Number(payRow.grandTotal) || 0;
-
+    const total = rowTotal(payRow);
     const already = Number(payRow.amountPaid) || 0;
-
     const add = Number(payAmount) || 0;
 
     if (add <= 0) {
@@ -354,7 +605,16 @@ const AdmissionList = () => {
 
     const newPaid = already + add;
 
-    const status = newPaid >= total ? "Paid" : "Partial";
+    const newStatuses = ["Installment", "Monthly", "Pending"];
+
+    const status =
+      newPaid >= total
+        ? newStatuses.includes(payRow.paymentStatus)
+          ? "Completed"
+          : "Paid"
+        : newStatuses.includes(payRow.paymentStatus)
+          ? payRow.paymentStatus
+          : "Partial";
 
     let list = [];
 
@@ -370,7 +630,6 @@ const AdmissionList = () => {
       if (r.id !== payRow.id) return r;
 
       const today = new Date();
-
       const payDate = `${today.getFullYear()}-${String(
         today.getMonth() + 1,
       ).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -381,9 +640,7 @@ const AdmissionList = () => {
         paymentStatus: status,
         paymentMode: payMode,
         payments: [
-          ...(r.payments || []).map((pm) => ({
-            ...pm,
-          })),
+          ...(r.payments || []).map((pm) => ({ ...pm })),
           {
             date: payDate,
             amount: add,
@@ -404,45 +661,21 @@ const AdmissionList = () => {
     setPayRow(null);
     setPayAmount("");
 
-    if (updatedRow) {
-      setReceiptRow(updatedRow);
-    }
+    /* Receipt AUTOMATIC new values sobt ugto */
+
+    if (updatedRow) setReceiptRow(updatedRow);
   };
 
-  /* ============================================
-     DELETE HANDLER
-  ============================================ */
-
-  const handleDelete = (row) => {
-    const deleted = deleteAdmission(row);
-
-    if (!deleted) return;
-
-    const updated = loadAdmissions();
-
-    setAdmissions(updated);
-
-    setViewRow(null);
-    setEditRow(null);
-    setReceiptRow(null);
-
-    const newTotalPages = Math.max(1, Math.ceil(updated.length / pageSize));
-
-    if (page > newTotalPages) {
-      setPage(newTotalPages);
-    }
-  };
-
-  /* ============================================
-     JSX
-  ============================================ */
+  /* ================= RENDER ================= */
 
   return (
     <div className="al">
-      {/* FILTER CARD */}
+      {/* ================= FILTER CARD ================= */}
 
       <div className="al-filter-card">
         <div className="al-filters">
+          {/* SEARCH */}
+
           <div className="al-field al-search">
             <label>Search</label>
 
@@ -459,6 +692,8 @@ const AdmissionList = () => {
               />
             </div>
           </div>
+
+          {/* BUILDING */}
 
           <div className="al-field">
             <label>Building</label>
@@ -477,6 +712,8 @@ const AdmissionList = () => {
             </select>
           </div>
 
+          {/* PAYMENT */}
+
           <div className="al-field">
             <label>Payment Status</label>
 
@@ -490,6 +727,8 @@ const AdmissionList = () => {
               <option value="Pending">Pending</option>
             </select>
           </div>
+
+          {/* STATUS */}
 
           <div className="al-field">
             <label>Status</label>
@@ -506,40 +745,99 @@ const AdmissionList = () => {
             </select>
           </div>
 
+          {/* DATE RANGE */}
+
+          <div className="al-field al-date-field">
+            <label>Date</label>
+
+            <select
+              value={dateFilter}
+              onChange={(e) => {
+                setDateFilter(e.target.value);
+                setDateFrom("");
+                setDateTo("");
+              }}
+            >
+              <option value="All">All Time</option>
+              <option value="Today">Today</option>
+              <option value="This Month">This Month</option>
+              <option value="Last Month">Last Month</option>
+              <option value="Custom">Custom Range</option>
+            </select>
+          </div>
+
+          {dateFilter === "Custom" && (
+            <>
+              <div className="al-field al-date-range">
+                <label>From</label>
+
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                />
+              </div>
+
+              <div className="al-field al-date-range">
+                <label>To</label>
+
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                />
+              </div>
+            </>
+          )}
+
+          {/* CLEAR */}
+
           <button type="button" className="al-clear" onClick={clearFilters}>
             Clear
           </button>
         </div>
       </div>
 
-      {/* SUMMARY */}
+      {/* ================= ACTION + PILLS ================= */}
 
       <div className="al-top-row">
         <div className="al-summary-actions">
+          {/* TOTAL */}
+
           <div className="al-pill total-pill">
             <span>Total</span>
             <strong>{sums.total}</strong>
           </div>
+
+          {/* PAID */}
 
           <div className="al-pill paid-pill">
             <span>Paid</span>
             <strong>{sums.paid}</strong>
           </div>
 
+          {/* PARTIAL */}
+
           <div className="al-pill partial-pill">
             <span>Partial</span>
             <strong>{sums.partial}</strong>
           </div>
+
+          {/* PENDING */}
 
           <div className="al-pill pending-pill">
             <span>Pending</span>
             <strong>{sums.pending}</strong>
           </div>
 
+          {/* REVENUE */}
+
           <div className="al-pill revenue-pill">
             <span>Revenue</span>
             <strong>{money(sums.revenue)}</strong>
           </div>
+
+          {/* PDF */}
 
           <button
             type="button"
@@ -549,154 +847,147 @@ const AdmissionList = () => {
             PDF
           </button>
 
+          {/* CSV */}
+
           <button type="button" className="al-btn al-csv" onClick={exportCsv}>
             CSV
           </button>
         </div>
       </div>
 
-      {/* TABLE */}
+      {/* ================= TABLE (11 columns) ================= */}
 
       <div className="al-table-card">
         <div className="al-table-wrap">
           <table className="al-table">
             <thead>
               <tr>
-                <th>U No</th>
+                <th>User No</th>
                 <th>Date</th>
                 <th>Name</th>
-                <th>Floor</th>
-                <th>Room Type</th>
-                <th>Room No</th>
-                <th>Bed Type</th>
-                <th>Bed No</th>
-                <th>From Date</th>
-                <th>To Date</th>
-                <th> Rent</th>
-                <th> Months</th>
-                <th>Total Rent</th>
-                <th>P Mode</th>
-                <th>P Status</th>
-                <th>Receipt</th>
+                <th>Amount</th>
+                <th>GST Amt</th>
+                <th>Total (+GST)</th>
+                <th>Paid</th>
+                <th>Pending</th>
+                <th>Payment Mode</th>
+                <th>Status</th>
+                <th>Due Date</th>
               </tr>
             </thead>
 
             <tbody>
               {paged.length === 0 ? (
                 <tr>
-                  <td colSpan="16" className="al-empty">
+                  <td colSpan="11" className="al-empty">
                     No admissions found
                   </td>
                 </tr>
               ) : (
-                paged.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="al-row"
-                    onClick={() => setViewRow(row)}
-                  >
-                    <td>
-                      <span className="al-user-no">{row.userNo || "-"}</span>
-                    </td>
+                paged.map((row) => {
+                  const paid = Number(row.amountPaid) || 0;
 
-                    <td>
-                      <span className="al-date">
-                        {row.admissionDate || "-"}
-                      </span>
-                    </td>
+                  const gstAmt = row.includeGst
+                    ? (paid * (Number(row.gstPercent) || 0)) / 100
+                    : 0;
 
-                    <td>
-                      <span className="al-name">{row.studentName || "-"}</span>
-                    </td>
+                  const total = Number(row.totalAmount) || paid + gstAmt;
 
-                    <td>
-                      <span className="al-floor">{row.floor || "-"}</span>
-                    </td>
+                  const pending = total - paid;
 
-                    <td>
-                      <span className="al-rtype">{row.roomType || "-"}</span>
-                    </td>
+                  return (
+                    <tr
+                      key={row.id}
+                      className="al-row"
+                      onClick={() => setViewRow(row)}
+                    >
+                      <td>
+                        <span className="al-user-no">{row.userNo || "-"}</span>
+                      </td>
 
-                    <td>
-                      <span className="al-room">{row.roomNumber || "-"}</span>
-                    </td>
+                      <td>
+                        <span className="al-date">
+                          {row.admissionDate || "-"}
+                        </span>
+                      </td>
 
-                    <td>
-                      <span className="al-btype">{row.bedType || "-"}</span>
-                    </td>
+                      <td>
+                        <span className="al-name">
+                          {row.studentName || "-"}
+                        </span>
+                      </td>
 
-                    <td>
-                      <span className="al-bed">{row.bedNumber || "-"}</span>
-                    </td>
+                      <td>
+                        <span className="al-amount">{money(paid)}</span>
+                      </td>
 
-                    <td>
-                      <span className="al-date">{row.stayFrom || "-"}</span>
-                    </td>
+                      <td>
+                        <span className="al-amount">{money(gstAmt)}</span>
+                      </td>
 
-                    <td>
-                      <span className="al-date">{row.stayTo || "-"}</span>
-                    </td>
+                      <td>
+                        <span className="al-amount">{money(total)}</span>
+                      </td>
 
-                    <td>
-                      <span className="al-amount">
-                        {money(row.monthlyRent)}
-                      </span>
-                    </td>
+                      <td>
+                        <span className="al-amount al-paid">{money(paid)}</span>
+                      </td>
 
-                    <td>
-                      <span className="al-months">
-                        {row.totalMonths || "-"}
-                      </span>
-                    </td>
-
-                    <td>
-                      <span className="al-amount">{money(row.grandTotal)}</span>
-                    </td>
-
-                    <td>
-                      <span className="al-mode">{row.paymentMode || "-"}</span>
-                    </td>
-
-                    <td>
-                      {row.paymentStatus === "Paid" ? (
-                        <span className="al-payment-status paid">Paid</span>
-                      ) : (
-                        <button
-                          type="button"
-                          className={`al-payment-status payable ${String(
-                            row.paymentStatus || "",
-                          ).toLowerCase()}`}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openPay(row);
-                          }}
-                          title="Pay Remaining"
+                      <td>
+                        <span
+                          className={`al-amount al-balance ${
+                            pending > 0 ? "due" : "clear"
+                          }`}
                         >
-                          {row.paymentStatus || "Pending"}
-                        </button>
-                      )}
-                    </td>
+                          {money(pending)}
+                        </span>
+                      </td>
 
-                    <td>
-                      <button
-                        type="button"
-                        className="al-receipt-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setReceiptRow(row);
-                        }}
-                      >
-                        Receipt
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                      <td>
+                        <span className="al-bed">{row.paymentMode || "-"}</span>
+                      </td>
+
+                      <td>
+                        {row.paymentStatus === "Paid" ? (
+                          <span className="al-payment-status paid">Paid</span>
+                        ) : (
+                          <button
+                            type="button"
+                            className={`al-payment-status payable ${String(
+                              row.paymentStatus || "",
+                            ).toLowerCase()}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+
+                              if (row.paymentStatus === "Installment") {
+                                setInstRow(row);
+                              } else {
+                                openPay(row);
+                              }
+                            }}
+                            title={
+                              row.paymentStatus === "Installment"
+                                ? "Installment Details"
+                                : "Pay Remaining"
+                            }
+                          >
+                            {row.paymentStatus || "Pending"}
+                          </button>
+                        )}
+                      </td>
+
+                      <td>
+                        <span className="al-date">{row.dueDate || "-"}</span>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
         </div>
 
-        {/* PAGER */}
+        {/* ================= PAGINATION ================= */}
 
         <div className="al-pager">
           <span className="al-page-info">
@@ -756,13 +1047,13 @@ const AdmissionList = () => {
         </div>
       </div>
 
-      {/* RECEIPT */}
+      {/* ================= RECEIPT POPUP ================= */}
 
       {receiptRow && (
         <Receipt row={receiptRow} onClose={() => setReceiptRow(null)} />
       )}
 
-      {/* PAYMENT MODAL */}
+      {/* ===== PAY REMAINING MODAL ===== */}
 
       {payRow && (
         <div className="ap-overlay" onClick={() => setPayRow(null)}>
@@ -779,7 +1070,7 @@ const AdmissionList = () => {
 
               <div>
                 <span>Grand Total</span>
-                <b>{money(payRow.grandTotal)}</b>
+                <b>{money(rowTotal(payRow))}</b>
               </div>
 
               <div>
@@ -790,10 +1081,7 @@ const AdmissionList = () => {
               <div>
                 <span>Remaining</span>
                 <b className="ap-rem">
-                  {money(
-                    (Number(payRow.grandTotal) || 0) -
-                      (Number(payRow.amountPaid) || 0),
-                  )}
+                  {money(rowTotal(payRow) - (Number(payRow.amountPaid) || 0))}
                 </b>
               </div>
             </div>
@@ -842,7 +1130,289 @@ const AdmissionList = () => {
         </div>
       )}
 
-      {/* VIEW MODAL */}
+      {/* ===== INSTALLMENT DETAILS MODAL ===== */}
+
+      {instRow && instLive && (
+        <div className="id-overlay" onClick={closeInstallments}>
+          <div className="id-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="id-title">
+              <b>Installment Details</b>
+              <button
+                type="button"
+                className="id-close"
+                onClick={closeInstallments}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="id-body">
+              <div className="id-summary">
+                <span>
+                  Total: <b>{money(instTotal)}</b>
+                </span>
+                <span>
+                  Paid: <b className="id-paid">{money(instPaid)}</b>
+                </span>
+                <span>
+                  Pending: <b className="id-pending">{money(instPending)}</b>
+                </span>
+              </div>
+
+              <button
+                type="button"
+                className="id-add"
+                onClick={() => {
+                  setShowInstForm((open) => !open);
+                  setCompletingInstId(null);
+                }}
+                disabled={unscheduledPending <= 0}
+              >
+                ADD INSTALLMENT
+              </button>
+
+              {showInstForm && (
+                <div className="id-add-form">
+                  <label>
+                    Amount
+                    <input
+                      type="number"
+                      min="1"
+                      max={unscheduledPending}
+                      value={newInstAmount}
+                      onChange={(e) => setNewInstAmount(e.target.value)}
+                      placeholder="Enter amount"
+                    />
+                  </label>
+                  <label>
+                    Due Date
+                    <input
+                      type="date"
+                      value={newInstDueDate}
+                      onChange={(e) => setNewInstDueDate(e.target.value)}
+                    />
+                  </label>
+                  <label className="id-remark-field">
+                    Remark
+                    <input
+                      type="text"
+                      value={newInstRemark}
+                      onChange={(e) => setNewInstRemark(e.target.value)}
+                      placeholder="Optional remark"
+                    />
+                  </label>
+                  <div className="id-form-actions">
+                    <button
+                      type="button"
+                      className="id-add"
+                      onClick={saveNewInstallment}
+                    >
+                      ADD
+                    </button>
+                    <button
+                      type="button"
+                      className="id-form-cancel"
+                      onClick={() => setShowInstForm(false)}
+                    >
+                      CANCEL
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="id-table-wrap">
+                <table className="id-table">
+                  <thead>
+                    <tr>
+                      <th>Invoice No</th>
+                      <th>Amount</th>
+                      <th>Due Date</th>
+                      <th>Installment Date</th>
+                      <th>Status / Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {instSchedules.map((item, i) => (
+                      <tr key={item.id || `${item.dueDate}-${i}`}>
+                        <td>
+                          {item.invoiceNo ||
+                            `INS${String(i + 1).padStart(4, "0")}`}
+                        </td>
+                        <td>{money(item.amount)}</td>
+                        <td>{item.dueDate || "-"}</td>
+                        <td>
+                          {item.status === "Completed" ? (
+                            item.installmentDate || "-"
+                          ) : completingInstId === item.id ? (
+                            <input
+                              className="id-inline-date"
+                              type="date"
+                              value={completeInstDate}
+                              onChange={(e) =>
+                                setCompleteInstDate(e.target.value)
+                              }
+                            />
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td>
+                          {item.status === "Completed" ? (
+                            <span className="id-complete">Completed</span>
+                          ) : completingInstId === item.id ? (
+                            <div className="id-inline-actions">
+                              <select
+                                value={completeInstMode}
+                                onChange={(e) =>
+                                  setCompleteInstMode(e.target.value)
+                                }
+                              >
+                                <option>Cash</option>
+                                <option>UPI</option>
+                                <option>Online</option>
+                                <option>Bank</option>
+                                <option>Bank Transfer</option>
+                                <option>Cheque</option>
+                              </select>
+                              <button
+                                type="button"
+                                className="id-save"
+                                onClick={() => saveInstallmentComplete(item)}
+                              >
+                                SAVE
+                              </button>
+                              <button
+                                type="button"
+                                className="id-cancel"
+                                onClick={() => setCompletingInstId(null)}
+                              >
+                                CANCEL
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              className="id-mark"
+                              onClick={() => {
+                                setCompletingInstId(item.id);
+                                setCompleteInstDate(todayISO());
+                                setCompleteInstMode(item.paymentMode || "Cash");
+                                setShowInstForm(false);
+                              }}
+                            >
+                              MARK COMPLETE
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+
+                    {instSchedules.length === 0 &&
+                      instPayments.map((pm, i) => (
+                        <tr key={`${pm.date}-${i}`}>
+                          <td>
+                            {pm.invoiceNo ||
+                              `INV${String(i + 1).padStart(5, "0")}`}
+                          </td>
+                          <td>{money(pm.amount)}</td>
+                          <td>{pm.dueDate || instLive.dueDate || "-"}</td>
+                          <td>{pm.date || "-"}</td>
+                          <td>
+                            <span className="id-complete">Completed</span>
+                          </td>
+                        </tr>
+                      ))}
+
+                    {unscheduledPending > 0 && (
+                      <tr>
+                        <td>{`INS${String(instSchedules.length + 1).padStart(4, "0")}`}</td>
+                        <td>{money(unscheduledPending)}</td>
+                        <td>{instLive.dueDate || "-"}</td>
+                        <td>
+                          {completingInstId === "remaining" ? (
+                            <input
+                              className="id-inline-date"
+                              type="date"
+                              value={completeInstDate}
+                              onChange={(e) =>
+                                setCompleteInstDate(e.target.value)
+                              }
+                            />
+                          ) : (
+                            "-"
+                          )}
+                        </td>
+                        <td>
+                          {completingInstId === "remaining" ? (
+                            <div className="id-inline-actions">
+                              <select
+                                value={completeInstMode}
+                                onChange={(e) =>
+                                  setCompleteInstMode(e.target.value)
+                                }
+                              >
+                                <option>Cash</option>
+                                <option>UPI</option>
+                                <option>Online</option>
+                                <option>Bank</option>
+                                <option>Bank Transfer</option>
+                                <option>Cheque</option>
+                              </select>
+                              <button
+                                type="button"
+                                className="id-save"
+                                onClick={() =>
+                                  saveInstallmentComplete({
+                                    amount: unscheduledPending,
+                                  })
+                                }
+                              >
+                                SAVE
+                              </button>
+                              <button
+                                type="button"
+                                className="id-cancel"
+                                onClick={() => setCompletingInstId(null)}
+                              >
+                                CANCEL
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              type="button"
+                              className="id-mark"
+                              onClick={() => {
+                                setCompletingInstId("remaining");
+                                setCompleteInstDate(todayISO());
+                                setCompleteInstMode("Cash");
+                                setShowInstForm(false);
+                              }}
+                            >
+                              MARK COMPLETE
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+
+                    {instSchedules.length === 0 &&
+                      instPayments.length === 0 &&
+                      unscheduledPending <= 0 && (
+                        <tr>
+                          <td colSpan="5" className="id-empty">
+                            No installments
+                          </td>
+                        </tr>
+                      )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===== VIEW DETAILS MODAL ===== */}
 
       {viewRow && (
         <div className="alv-overlay" onClick={() => setViewRow(null)}>
@@ -850,7 +1420,6 @@ const AdmissionList = () => {
             <div className="alv-head">
               <div>
                 <b>{viewRow.studentName || "-"}</b>
-
                 <span>
                   {viewRow.userNo || "-"} · {viewRow.building || "-"} · Room{" "}
                   {viewRow.roomNumber || "-"} · Bed {viewRow.bedNumber || "-"}
@@ -862,7 +1431,7 @@ const AdmissionList = () => {
                 className="alv-close"
                 onClick={() => setViewRow(null)}
               >
-                Close
+                ✕
               </button>
             </div>
 
@@ -984,9 +1553,41 @@ const AdmissionList = () => {
                   <b>{viewRow.status || "-"}</b>
                 </p>
               </div>
-            </div>
 
-            {/* VIEW ACTIONS */}
+              {/* ===== MONTHLY RENT HISTORY ===== */}
+
+              {(viewRow.rentLog || []).length > 0 && (
+                <>
+                  <div className="alv-sec">Monthly Rent History</div>
+
+                  <table className="alv-rent-table">
+                    <thead>
+                      <tr>
+                        <th>Month</th>
+                        <th>Rent</th>
+                        <th>GST</th>
+                        <th>Received</th>
+                        <th>Mode</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {(viewRow.rentLog || []).map((r, i) => (
+                        <tr key={`${r.month}-${i}`}>
+                          <td>{r.month || "-"}</td>
+                          <td>{money(r.rent)}</td>
+                          <td>{r.gst ? money(r.gst) : "-"}</td>
+                          <td>{money(r.received)}</td>
+                          <td>{r.mode || "-"}</td>
+                          <td>{r.date || "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </>
+              )}
+            </div>
 
             <div className="alv-actions">
               <button
@@ -997,45 +1598,22 @@ const AdmissionList = () => {
                   setViewRow(null);
                 }}
               >
-                <FaEdit />
-                Edit
-              </button>
-
-              {viewRow.paymentStatus !== "Paid" && (
-                <button
-                  type="button"
-                  className="alv-pay"
-                  onClick={() => {
-                    openPay(viewRow);
-                    setViewRow(null);
-                  }}
-                >
-                  Pay Remaining
-                </button>
-              )}
-
-              <button
-                type="button"
-                className="alv-rcpt"
-                onClick={() => setReceiptRow(viewRow)}
-              >
-                Receipt
+                ✏ Edit
               </button>
 
               <button
                 type="button"
                 className="alv-delete"
-                onClick={() => handleDelete(viewRow)}
+                onClick={() => deleteAdmission(viewRow)}
               >
-                <FaTrashAlt />
-                Delete
+                🗑 Delete
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* EDIT MODAL */}
+      {/* ===== EDIT ADMISSION ===== */}
 
       {editRow && (
         <div className="al-edit-overlay">
@@ -1044,18 +1622,14 @@ const AdmissionList = () => {
               <b>Edit Admission — {editRow.studentName || editRow.userNo}</b>
 
               <button type="button" onClick={() => setEditRow(null)}>
-                Close
+                ✕ Close
               </button>
             </div>
 
             <div className="al-edit-body">
               <AdmissionForm
                 editRow={editRow}
-                onDone={() => {
-                  setAdmissions(loadAdmissions());
-
-                  setEditRow(null);
-                }}
+                onDone={() => setEditRow(null)}
                 onCancel={() => setEditRow(null)}
               />
             </div>

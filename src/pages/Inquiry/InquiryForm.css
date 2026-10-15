@@ -1,148 +1,282 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-
 .iq {
   width: 100%;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 6px 10px 10px;
+  padding: 8px 10px;
   box-sizing: border-box;
-  display: block !important;
-  text-align: left;
-  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
-  color: #3f4c63;
-}
-.iq input,
-.iq select,
-.iq button {
-  font-family: inherit;
+  background: #ffffff !important;
+  color: #111827;
+  font-family: Poppins, Arial, sans-serif;
 }
 
+/* ================= TITLES ================= */
+
 .iq-title {
-  display: block;
-  width: 100%;
-  background: #eef2f6;
-  border: 1px solid #d7dee7;
-  border-radius: 12px;
-  text-align: center;
+  margin: 4px 0 10px;
+  color: #1f2937;
+  font-size: 12px;
   font-weight: 600;
-  font-size: 11.5px;
-  padding: 4px;
-  margin: 4px 0 8px;
-  color: #334155;
 }
+
+/* ================= GRIDS ================= */
 
 .iq-grid3 {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 11px 8px;
-  margin-bottom: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 8px;
+  background: #ffffff;
 }
 
 .iq-grid1 {
   display: grid;
   grid-template-columns: 1fr;
-  margin-bottom: 6px;
+  gap: 8px;
+  margin-bottom: 10px;
+  background: #ffffff;
 }
+
+/* ================= FIELD ================= */
 
 .iq-field {
   position: relative;
-  min-width: 0;
+  width: 100%;
+  height: 36px;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  background: #ffffff !important;
+  transition: border-color 0.18s ease;
 }
+
+.iq-field:focus-within {
+  border-color: #42a5f5;
+}
+
+/* ================= FLOATING LABEL ================= */
+
+.iq-label {
+  position: absolute;
+  top: -7px;
+  left: 9px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 0 4px;
+  color: #5f6670;
+  font-size: 9px;
+  font-weight: 400;
+  line-height: 13px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.iq-label em {
+  margin-left: 2px;
+  color: #e11d48;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* ================= FOCUS LABEL ================= */
+
+.iq-field:focus-within .iq-label {
+  top: -7px;
+  left: 9px;
+  z-index: 10;
+  padding: 3px 9px;
+  background: #42a5f5;
+  color: #ffffff;
+  border-radius: 12px;
+  line-height: 1;
+}
+
+.iq-field:focus-within .iq-label em {
+  color: #ffffff;
+}
+
+/* ================= INPUT / SELECT ================= */
 
 .iq-field input,
 .iq-field select {
   width: 100%;
-  height: 30px;
+  height: 34px;
   box-sizing: border-box;
-  border: 1px solid #dde3ec;
-  border-radius: 7px;
-  padding: 0 8px;
+  border: 0;
+  outline: none;
+  background: transparent !important;
+  padding: 0 9px;
+  color: #111827;
+  font-family: Poppins, Arial, sans-serif;
   font-size: 11px;
   font-weight: 400;
-  background: #fdfdfe;
-  color: #3f4c63;
-  outline: none;
+  line-height: 34px;
 }
 
 .iq-field input:focus,
 .iq-field select:focus {
-  border-color: #2f7ab8;
-  background: #fff;
+  outline: none;
+  box-shadow: none;
 }
 
-.iq-label {
-  position: absolute;
-  top: -6px;
-  left: 8px;
-  background: #fff;
-  padding: 0 3px;
-  font-size: 9px;
-  font-weight: 500;
-  color: #5c6b83;
+/* ================= SELECT ================= */
+
+.iq-field select {
+  cursor: pointer;
+  appearance: auto;
 }
 
-.iq-label em {
-  color: #e11d48;
-  font-style: normal;
-  font-weight: 600;
-}
-
-.iq-gender {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 30px;
+.iq-field select option {
+  color: #111827;
+  background: #ffffff;
   font-size: 11px;
   font-weight: 400;
-  color: #3f4c63;
+}
+
+/* ================= DATE ================= */
+
+.iq-field input[type="date"] {
+  color: #111827;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.iq-field input[type="date"]::-webkit-calendar-picker-indicator {
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+  opacity: 0.65;
+}
+
+/* ================= VALUE STATE ================= */
+
+.iq-field.has-value .iq-label {
+  top: -7px;
+  left: 9px;
+  padding: 0 4px;
+  background: #ffffff;
+  color: #5f6670;
+  border-radius: 4px;
+}
+
+.iq-field.has-value:focus-within .iq-label {
+  padding: 3px 9px;
+  background: #42a5f5;
+  color: #ffffff;
+  border-radius: 12px;
+}
+
+.iq-field.has-value:focus-within .iq-label em {
+  color: #ffffff;
+}
+
+/* ================= GENDER ================= */
+
+.iq-gender {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+  box-sizing: border-box;
+  background: #ffffff;
+  color: #5f6670;
+  font-size: 11px;
+  font-weight: 400;
 }
 
 .iq-gender b {
-  font-weight: 600;
+  color: #5f6670;
+  font-size: 9px;
+  font-weight: 400;
 }
 
 .iq-gender label {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 4px;
+  color: #5f6670;
+  font-size: 11px;
+  font-weight: 400;
   cursor: pointer;
 }
 
-.iq-gender input {
+.iq-gender input[type="radio"] {
   width: 12px;
   height: 12px;
-  accent-color: #1d4ed8;
   margin: 0;
+  padding: 0;
+  accent-color: #42a5f5;
+  cursor: pointer;
 }
 
+/* ================= NOTE ================= */
+
 .iq-note {
-  text-align: center;
-  color: #e11d48;
-  font-size: 10px;
+  margin: 8px 0 10px;
+  color: #707985;
+  font-size: 9px;
   font-weight: 400;
-  margin: 4px 0 4px;
+  background: #ffffff;
 }
+
+/* ================= SUBMIT ================= */
 
 .iq-submit-wrap {
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
+  margin-top: 4px;
+  background: #ffffff;
 }
 
 .iq-submit {
-  height: 28px;
-  min-width: 90px;
-  background: #1d4ed8;
-  color: #fff;
+  min-width: 70px;
+  height: 30px;
+  padding: 0 16px;
   border: 0;
   border-radius: 6px;
-  font-size: 11px;
+  background: #42a5f5;
+  color: #ffffff;
+  font-family: Poppins, Arial, sans-serif;
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
 }
 
-@media (max-width: 800px) {
+.iq-submit:hover {
+  background: #3498e8;
+}
+
+.iq-submit:active {
+  transform: translateY(1px);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+  .iq-grid3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .iq {
+    padding: 8px;
+  }
+
   .iq-grid3 {
     grid-template-columns: 1fr;
+  }
+
+  .iq-gender {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .iq-submit-wrap {
+    justify-content: flex-start;
   }
 }

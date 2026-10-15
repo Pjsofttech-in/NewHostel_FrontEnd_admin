@@ -253,8 +253,9 @@ const UserList = () => {
       {/* FILTER CARD */}
       <div className="ul-filter-card">
         <div className="ul-filters">
-          <div className="ul-field ul-search">
-            <label>Search</label>
+          {/* SEARCH */}
+          <div className="ul-field ul-search ul-float-field">
+            <span className="ul-float-label">Search</span>
 
             <div className="ul-search-box">
               <span>⌕</span>
@@ -270,8 +271,11 @@ const UserList = () => {
             </div>
           </div>
 
-          <div className="ul-field">
-            <label>Payment Mode</label>
+          {/* PAYMENT MODE */}
+          <div
+            className={`ul-field ul-float-field ${pMode ? "has-value" : ""}`}
+          >
+            <span className="ul-float-label">Payment Mode</span>
 
             <select
               value={pMode}
@@ -280,15 +284,18 @@ const UserList = () => {
                 setPage(1);
               }}
             >
-              <option value="">All Payment Modes</option>
+              <option value=""></option>
               <option>Cash</option>
               <option>UPI</option>
               <option>Online</option>
             </select>
           </div>
 
-          <div className="ul-field">
-            <label>Payment Status</label>
+          {/* PAYMENT STATUS */}
+          <div
+            className={`ul-field ul-float-field ${pStatus ? "has-value" : ""}`}
+          >
+            <span className="ul-float-label">Payment Status</span>
 
             <select
               value={pStatus}
@@ -297,15 +304,18 @@ const UserList = () => {
                 setPage(1);
               }}
             >
-              <option value="">All Payment Status</option>
+              <option value=""></option>
               <option>Paid</option>
               <option>Pending</option>
               <option>Partial</option>
             </select>
           </div>
 
-          <div className="ul-field">
-            <label>Room Type</label>
+          {/* ROOM TYPE */}
+          <div
+            className={`ul-field ul-float-field ${roomType ? "has-value" : ""}`}
+          >
+            <span className="ul-float-label">Room Type</span>
 
             <select
               value={roomType}
@@ -314,15 +324,18 @@ const UserList = () => {
                 setPage(1);
               }}
             >
-              <option value="">All Room Types</option>
+              <option value=""></option>
               <option>Single</option>
               <option>Double</option>
               <option>Triple</option>
             </select>
           </div>
 
-          <div className="ul-field">
-            <label>Bed Type</label>
+          {/* BED TYPE */}
+          <div
+            className={`ul-field ul-float-field ${bedType ? "has-value" : ""}`}
+          >
+            <span className="ul-float-label">Bed Type</span>
 
             <select
               value={bedType}
@@ -331,7 +344,7 @@ const UserList = () => {
                 setPage(1);
               }}
             >
-              <option value="">All Bed Types</option>
+              <option value=""></option>
               <option>Single</option>
               <option>Bunk</option>
             </select>
@@ -371,7 +384,6 @@ const UserList = () => {
             <strong>₹0.00</strong>
           </div>
 
-          {/* PDF + CSV immediately beside pills */}
           <div className="ul-actions">
             <button type="button" className="ul-btn ul-pdf" onClick={pdf}>
               ↓ PDF

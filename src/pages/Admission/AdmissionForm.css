@@ -1,31 +1,26 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
-/* =========================================
-   ADMISSION FORM
-========================================= */
-
 .af {
   width: 100%;
-  background: #fff;
+  box-sizing: border-box;
+  background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 7px;
-  padding: 6px 10px 8px;
-  box-sizing: border-box;
-  display: block !important;
-  text-align: left;
+  padding: 10px 12px 12px;
   font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
   color: #3f4c63;
 }
 
-.af input,
-.af select,
-.af button {
-  font-family: inherit;
+.af *,
+.af *::before,
+.af *::after {
+  box-sizing: border-box;
 }
+
 .af-grid {
   display: grid !important;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 11px 8px;
+  gap: 12px 9px;
   width: 100%;
 }
 
@@ -35,347 +30,369 @@
   width: 100%;
 }
 
-.af-field input,
-.af-field select {
-  width: 100%;
-  height: 30px;
-  box-sizing: border-box;
-  border: 1px solid #dde3ec;
-  border-radius: 5px;
-  padding: 0 8px;
-  font-size: 11px;
-  font-weight: 400;
-  font-family: inherit;
-  background: #fdfdfe;
-  color: #3f4c63;
-  outline: none;
-  transition:
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
-}
-
-.af-field select {
-  cursor: pointer;
-}
-
-.af-field input[type="date"] {
-  color: #3f4c63;
-  cursor: pointer;
-}
-
-.af-field input[type="number"] {
-  appearance: textfield;
-  -moz-appearance: textfield;
-}
-
-.af-field input[type="number"]::-webkit-outer-spin-button,
-.af-field input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.af-field input[type="file"] {
-  height: 30px;
-  padding: 4px 6px;
-  font-size: 10px;
-  cursor: pointer;
-}
-
-.af-field input::placeholder {
-  color: #a8b3c4;
-  font-weight: 400;
-}
-
-.af-field input:focus,
-.af-field select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.06);
-  background: #fff;
-}
-
-/* =========================================
-   FLOATING LABEL
-========================================= */
-
 .af-label {
   position: absolute;
-  z-index: 2;
-  top: -5px;
-  left: 7px;
-  background: #fff;
-  padding: 0 3px;
+  z-index: 5;
+  top: 0;
+  left: 10px;
+  transform: translateY(-50%);
+  padding: 2px 5px;
+  background: #ffffff;
+  color: #7b8798;
+  border-radius: 4px;
   font-size: 9px;
-  line-height: 11px;
+  line-height: 1;
   font-weight: 500;
-  color: #5c6b83;
-  pointer-events: none;
   white-space: nowrap;
+  pointer-events: none;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    padding 0.18s ease,
+    border-radius 0.18s ease;
 }
 
 .af-label em {
-  color: #ef4444;
-  font-style: normal;
-  font-weight: 600;
   margin-left: 2px;
+  color: #7b8798;
+  font-style: normal;
 }
 
-/* =========================================
-   PAYMENT STATUS
-========================================= */
+.af-field.is-focused .af-label {
+  padding: 3px 9px;
+  background: #42a5f5;
+  color: #ffffff;
+  border-radius: 12px;
+  z-index: 20;
+}
 
-.af-status {
+.af-field.is-focused .af-label em {
+  color: #ffffff;
+}
+
+.af-field input:not([type="checkbox"]):not([type="radio"]),
+.af-field select,
+.af-field textarea {
   width: 100%;
-  height: 30px;
-  box-sizing: border-box;
+  min-width: 0;
+  height: 36px;
+  border: 1px solid #d9e0ea;
+  border-radius: 5px;
+  outline: none;
+  background: #ffffff;
+  color: #3f4c63;
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.af-field input:not([type="checkbox"]):not([type="radio"]),
+.af-field select {
+  padding: 0 10px;
+}
+
+.af-field textarea {
+  min-height: 70px;
+  height: auto;
+  padding: 9px 10px;
+  resize: vertical;
+}
+
+.af-field input:not([type="checkbox"]):not([type="radio"]):focus,
+.af-field select:focus,
+.af-field textarea:focus {
+  border-color: #42a5f5;
+  box-shadow: 0 0 0 1px rgba(66, 165, 245, 0.08);
+}
+
+.af-field input::placeholder,
+.af-field textarea::placeholder {
+  color: #9aa4b2;
+  opacity: 1;
+}
+
+.af-field input[type="date"],
+.af-field input[type="month"] {
+  width: 100%;
+  height: 36px;
+  padding: 0 34px 0 10px;
+  border: 1px solid #d9e0ea;
+  border-radius: 5px;
+  outline: none;
+  background: #ffffff;
+  color: #3f4c63;
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.af-field input[type="date"]:focus,
+.af-field input[type="month"]:focus {
+  border-color: #42a5f5;
+  box-shadow: 0 0 0 1px rgba(66, 165, 245, 0.08);
+}
+
+.af-field input[type="date"]::-webkit-calendar-picker-indicator,
+.af-field input[type="month"]::-webkit-calendar-picker-indicator {
+  opacity: 0.65;
+  cursor: pointer;
+  margin-right: 2px;
+}
+
+.af-field input[readonly] {
+  background: #f8fafc;
+  color: #536176;
+  cursor: default;
+}
+
+.af-field input[type="number"]::-webkit-inner-spin-button,
+.af-field input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.6;
+}
+
+.af-field input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  accent-color: #42a5f5;
+  cursor: pointer;
+}
+
+.af-pr-gst {
+  width: 100%;
+  height: 36px;
   display: flex;
   align-items: center;
-  padding: 0 8px;
-  border: 1px solid #dde3ec;
+  gap: 7px;
+}
+
+.af-pr-gst > input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #d9e0ea;
   border-radius: 5px;
-  background: #fdfdfe;
+  outline: none;
+  background: #ffffff;
+  color: #3f4c63;
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
   font-size: 11px;
-  font-weight: 500;
 }
 
-.af-status.pending {
-  color: #dc2626;
-  background: #fff7f7;
-  border-color: #fecaca;
+.af-pr-gst > input:focus {
+  border-color: #42a5f5;
+  box-shadow: 0 0 0 1px rgba(66, 165, 245, 0.08);
 }
 
-.af-status.partial {
-  color: #d97706;
-  background: #fffbeb;
-  border-color: #fde68a;
-}
-
-.af-status.paid {
-  color: #15803d;
-  background: #f0fdf4;
-  border-color: #bbf7d0;
-}
-
-.af-status.empty {
-  color: #a8b3c4;
+.af-pr-text {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid #d9e0ea;
+  border-radius: 5px;
   background: #f8fafc;
-  font-weight: 400;
+  color: #8a94a6;
+  font-size: 10px;
 }
 
-/* =========================================
-   PAYMENT REFERENCE
-========================================= */
-
-.af-payment-note {
-  width: 100%;
-  height: 30px;
-  box-sizing: border-box;
+.af-gst-check {
+  height: 36px;
   display: flex;
   align-items: center;
   gap: 5px;
   padding: 0 8px;
-  border: 1px dashed #d8dee8;
+  border: 1px solid #d9e0ea;
   border-radius: 5px;
-  background: #f8fafc;
-}
-
-.af-payment-note span {
-  font-size: 9px;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.af-payment-note strong {
-  font-size: 9px;
-  color: #a8b3c4;
-  font-weight: 400;
-}
-
-/* =========================================
-   GST - BELOW TOTAL AMOUNT
-========================================= */
-
-.af-gst-row {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  /* 3rd column = Total Amount column */
-  grid-column: 3;
-
-  margin: 0;
-  padding: 0;
-
-  height: 30px;
-  box-sizing: border-box;
-}
-
-.af-gst-check {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 4px;
-
+  background: #ffffff;
+  color: #526078;
   font-size: 10px;
   font-weight: 500;
-  color: #475569;
-
   cursor: pointer;
-  user-select: none;
-
-  margin: 0;
-  padding: 0;
-}
-
-.af-gst-check input {
-  width: 12px;
-  height: 12px;
-
-  margin: 0;
-  padding: 0;
-
-  accent-color: #2563eb;
-  cursor: pointer;
+  white-space: nowrap;
 }
 
 .af-gst-check span {
   line-height: 1;
 }
 
-/* =========================================
-   GST RATE BADGE
-========================================= */
-
-.af-gst-rate {
-  display: none !important;
+.af-status {
+  width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  border: 1px solid #d9e0ea;
+  border-radius: 5px;
+  background: #ffffff;
+  color: #3f4c63;
+  font-size: 10px;
+  font-weight: 500;
 }
 
-/* =========================================
-   GRAND TOTAL
-========================================= */
+.af-status.empty {
+  background: #f8fafc;
+  color: #8a94a6;
+}
+
+.af-status.paid {
+  color: #218838;
+}
+.af-status.pending {
+  color: #d08a00;
+}
+.af-status.partial {
+  color: #2878c8;
+}
+.af-status.overdue {
+  color: #d9534f;
+}
 
 .af-grand-total-input {
   font-weight: 600 !important;
-  color: #1d4ed8 !important;
-  background: #f8fbff !important;
+  color: #2f6f9f !important;
+  background: #f7fbff !important;
 }
 
-/* =========================================
-   SIGNATURE / FILE UPLOADS
-========================================= */
-
-.af-file {
+.af-user-select {
   position: relative;
+  width: 100%;
 }
 
-.af-file input[type="file"] {
-  border-color: #dde3ec;
-  background: #fdfdfe;
+.af-user-select input {
+  width: 100%;
+  color: #3f4c63 !important;
+  background: #ffffff !important;
 }
 
-/* =========================================
-   ACTIONS
-========================================= */
+.af-user-select input::placeholder {
+  color: #9aa4b2 !important;
+  opacity: 1 !important;
+}
+
+.af-user-select-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid #d9e0ea;
+  border-radius: 5px;
+  box-shadow: 0 6px 18px rgba(30, 50, 80, 0.12);
+}
+
+.af-user-select-item {
+  width: 100%;
+  padding: 9px 10px;
+  background: #ffffff;
+  color: #3f4c63;
+  font-size: 11px;
+  text-align: left;
+  border: 0;
+  cursor: pointer;
+}
+
+.af-user-select-item:hover,
+.af-user-select-item.active {
+  background: #f0f7ff;
+  color: #2878c8;
+}
 
 .af-actions {
+  width: 100%;
   display: flex;
-  justify-content: flex-end;
   align-items: center;
-  gap: 6px;
-
-  margin-top: 5px;
-  padding-top: 5px;
-
-  border-top: 1px solid #f1f5f9;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid #edf1f5;
 }
 
 .af-save,
 .af-reset {
-  height: 26px;
-  min-width: 56px;
-
-  padding: 0 9px;
-
+  height: 34px;
+  padding: 0 18px;
   border-radius: 5px;
-
-  font-size: 11px;
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+  font-size: 10px;
   font-weight: 500;
-  font-family: inherit;
-
   cursor: pointer;
-
   transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    box-shadow 0.15s ease;
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 
 .af-save {
-  background: #2563eb;
-  color: #fff;
-  border: 1px solid #2563eb;
+  border: 1px solid #42a5f5;
+  background: #42a5f5;
+  color: #ffffff;
 }
 
 .af-save:hover {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: #3197ec;
+  border-color: #3197ec;
 }
 
 .af-reset {
-  background: #fff;
-  color: #2563eb;
-  border: 1px solid #bdd3f5;
+  border: 1px solid #d9e0ea;
+  background: #ffffff;
+  color: #667085;
 }
 
 .af-reset:hover {
-  background: #eff6ff;
-}
-
-.af,
-.af-grid,
-.af-field {
-  max-width: 100%;
-}
-
-.af {
-  overflow-x: hidden;
+  border-color: #bfc8d6;
+  background: #f8fafc;
+  color: #3f4c63;
 }
 
 @media (max-width: 1050px) {
   .af-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5px 7px;
-  }
-
-  .af-gst-row {
-    grid-column: auto;
   }
 }
 
-@media (max-width: 650px) {
-  .af {
-    padding: 6px 8px;
-  }
-
+@media (max-width: 700px) {
   .af-grid {
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: 12px;
   }
 
-  .af-gst-row {
-    justify-content: flex-start;
-    grid-column: auto;
+  .af {
+    padding: 9px;
   }
-}
 
-@media (max-width: 420px) {
   .af-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    justify-content: stretch;
   }
 
   .af-save,
   .af-reset {
-    width: 100%;
+    flex: 1;
+  }
+}
+
+@media (max-width: 450px) {
+  .af-pr-gst {
+    gap: 5px;
+  }
+
+  .af-gst-check {
+    padding: 0 6px;
+  }
+
+  .af-save,
+  .af-reset {
+    padding: 0 12px;
   }
 }

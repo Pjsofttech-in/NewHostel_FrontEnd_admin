@@ -1,12 +1,9 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./AdmissionForm.css";
 
 const REG_KEY = "hostel-registrations";
-const FLOOR_KEY = "hostel-admission-floors";
 const ADM_KEY = "hostel-admissions";
 const BANKS_KEY = "hostel-banks";
-
-const GST_RATE = 18;
 
 const todayStr = () => {
   const d = new Date();
@@ -35,28 +32,18 @@ const empty = {
   stayTo: "",
 
   totalMonths: "",
-  monthlyRent: "",
-  totalAmount: "",
-
-  includeGst: false,
-  gstPercent: GST_RATE,
-  gstAmount: "",
-  grandTotal: "",
 
   amountPaid: "",
   paymentStatus: "",
+  dueDate: "",
+  rentMonth: "",
+  includeGst: false,
+  gstPercent: "",
+  gstNo: "",
+  totalAmount: "",
   paymentMode: "",
-  txnId: "",
   bankId: "",
-
-  sources: "",
-  sourceDetails: "",
-
-  signature: "",
-
-  /* ===== POLICE VERIFICATION (PDF) ===== */
-
-  policeVerification: "",
+  txnId: "",
 };
 
 const loadJson = (key, fb) => {
@@ -68,74 +55,41 @@ const loadJson = (key, fb) => {
   }
 };
 
-/* ===== ADMITTED STUDENTS FILTER ===== */
+/* ===== ALL REGISTERED STUDENTS ===== */
 
-const readAvailableUsers = () => {
-  const regs = loadJson(REG_KEY, []);
-  const ads = loadJson(ADM_KEY, []);
+const readRegisteredUsers = () => loadJson(REG_KEY, []).filter((r) => r);
 
-  const takenUserNo = new Set();
-  const takenMobile = new Set();
-  const takenName = new Set();
+const Field = ({ label, required, children, pillOnValue = false }) => {
+  const [focused, setFocused] = useState(false);
 
-  ads.forEach((a) => {
-    if (!a || a.status === "Cancelled") return;
+  const child = React.Children.toArray(children)[0];
+  const childValue = child?.props?.value;
+  const hasValue =
+    childValue !== undefined &&
+    childValue !== null &&
+    String(childValue).trim() !== "";
 
-    if (a.userNo) takenUserNo.add(String(a.userNo).trim());
-    if (a.mobile) takenMobile.add(String(a.mobile).trim());
-    if (a.studentName)
-      takenName.add(String(a.studentName).trim().toLowerCase());
-  });
+  const pill = focused || (pillOnValue && hasValue);
 
-  return regs.filter((r) => {
-    if (!r) return false;
+  return (
+    <div
+      className={`af-field ${pill ? "is-focused" : ""}`}
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+          setFocused(false);
+        }
+      }}
+    >
+      {children}
 
-    const f = r.form || {};
-
-    const regMobiles = [
-      String(r.phone || "").trim(),
-      String(r.mobile || "").trim(),
-      String(f.mobile || "").trim(),
-      String(f.applicantMobile || "").trim(),
-    ].filter(Boolean);
-
-    const regNames = [
-      String(r.name || "")
-        .trim()
-        .toLowerCase(),
-      String(f.fullName || "")
-        .trim()
-        .toLowerCase(),
-    ].filter(Boolean);
-
-    return (
-      !takenUserNo.has(String(r.userNo || "").trim()) &&
-      !regMobiles.some((m) => takenMobile.has(m)) &&
-      !regNames.some((n) => takenName.has(n))
-    );
-  });
+      <span className="af-label">
+        {label}
+        {required && <em>*</em>}
+      </span>
+    </div>
+  );
 };
-
-const formatMoney = (value) => {
-  if (value === "" || value === null || value === undefined) {
-    return "";
-  }
-
-  return `₹${Number(value).toLocaleString("en-IN", {
-    maximumFractionDigits: 2,
-  })}`;
-};
-
-const Field = ({ label, required, children }) => (
-  <div className="af-field">
-    <span className="af-label">
-      {label}
-      {required && <em>*</em>}
-    </span>
-
-    {children}
-  </div>
-);
 
 /* =========================================
    SEARCHABLE STUDENT SELECT
@@ -388,6 +342,11 @@ const SearchableUserSelect = ({
   );
 };
 
+/* =========================================
+   ADMISSION FORM
+   - New admission : details + first fees
+========================================= */
+
 const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
   const [form, setForm] = useState(() =>
     editRow
@@ -395,36 +354,19 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
       : { ...empty, admissionDate: todayStr() },
   );
 
-  const loadUsers = () => {
-    const list = readAvailableUsers();
-
-    if (!editRow) return list;
-
-    const regs = loadJson(REG_KEY, []);
-    const own = regs.find((r) => String(r.userNo) === String(editRow.userNo));
-
-    if (own && !list.some((u) => String(u.userNo) === String(own.userNo))) {
-      return [own, ...list];
-    }
-
-    return list;
-  };
-
-  const [users, setUsers] = useState(loadUsers);
+  const [users, setUsers] = useState(() => readRegisteredUsers());
 
   useEffect(() => {
-    const refreshUsers = () => setUsers(loadUsers());
+    const refreshUsers = () => setUsers(readRegisteredUsers());
 
     window.addEventListener("storage", refreshUsers);
-    window.addEventListener("admission-updated", refreshUsers);
+    window.addEventListener("hostel-reg-updated", refreshUsers);
 
     return () => {
       window.removeEventListener("storage", refreshUsers);
-      window.removeEventListener("admission-updated", refreshUsers);
+      window.removeEventListener("hostel-reg-updated", refreshUsers);
     };
   }, []);
-
-  const floors = useMemo(() => loadJson(FLOOR_KEY, []), []);
 
   /* =========================================
      BANKS
@@ -468,106 +410,20 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
   };
 
   /* =========================================
-     PAYMENT STATUS
-  ========================================= */
-
-  const calculateStatus = (total, paid) => {
-    const totalAmount = Number(total) || 0;
-    const amountPaid = Number(paid) || 0;
-
-    if (totalAmount <= 0) return "";
-
-    if (amountPaid <= 0) return "Pending";
-
-    if (amountPaid < totalAmount) return "Partial";
-
-    return "Paid";
-  };
-
-  /* =========================================
-     PAYMENT CALCULATION
-  ========================================= */
-
-  const calculatePayment = (months, rent, includeGst, paid) => {
-    const total = (Number(months) || 0) * (Number(rent) || 0);
-
-    const gst = includeGst ? (total * GST_RATE) / 100 : 0;
-
-    const grand = total + gst;
-
-    const status = calculateStatus(grand, paid);
-
-    return {
-      totalAmount: total || "",
-      gstAmount: includeGst ? gst : "",
-      grandTotal: grand || "",
-      paymentStatus: status,
-    };
-  };
-
-  /* =========================================
      MAIN CHANGE HANDLER
   ========================================= */
 
   const set = (e) => {
     const { name, type, checked, value } = e.target;
 
-    setForm((prev) => {
-      const updated = {
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      };
-
-      let months = Number(prev.totalMonths) || 0;
-      let rent = Number(prev.monthlyRent) || 0;
-      let includeGst = prev.includeGst;
-      let paid = Number(prev.amountPaid) || 0;
-
-      if (name === "stayFrom" || name === "stayTo") {
-        const from = name === "stayFrom" ? value : prev.stayFrom;
-        const to = name === "stayTo" ? value : prev.stayTo;
-
-        const calculatedMonths = calculateMonths(from, to);
-
-        updated.totalMonths = calculatedMonths;
-
-        months = Number(calculatedMonths) || 0;
-      }
-
-      if (name === "monthlyRent") {
-        rent = Number(value) || 0;
-      }
-
-      if (name === "includeGst") {
-        includeGst = checked;
-        updated.gstPercent = GST_RATE;
-      }
-
-      if (name === "amountPaid") {
-        paid = Number(value) || 0;
-      }
-
-      if (
-        name === "stayFrom" ||
-        name === "stayTo" ||
-        name === "monthlyRent" ||
-        name === "includeGst" ||
-        name === "amountPaid"
-      ) {
-        const payment = calculatePayment(months, rent, includeGst, paid);
-
-        updated.totalAmount = payment.totalAmount;
-        updated.gstAmount = payment.gstAmount;
-        updated.grandTotal = payment.grandTotal;
-        updated.paymentStatus = payment.paymentStatus;
-      }
-
-      return updated;
-    });
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   /* =========================================
-     USER SELECTION
+     USER SELECTION — AUTOFILL
   ========================================= */
 
   const handleUserSelect = (userNo) => {
@@ -584,29 +440,44 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
 
     const f = user.form || {};
 
-    setForm((prev) => ({
-      ...prev,
+    setForm((prev) => {
+      const base = {
+        ...prev,
 
-      userNo,
+        userNo,
 
-      studentName: user.name || f.fullName || "",
+        studentName: user.name || f.fullName || "",
 
-      email: f.email || f.contactEmail || "",
+        email: f.email || f.contactEmail || "",
 
-      mobile: user.phone || f.mobile || "",
+        mobile: user.phone || f.mobile || "",
 
-      building: f.building || "",
+        building: f.buildingName || f.building || "",
 
-      floor: f.depFloor || f.floor || "",
+        floor: f.depFloor || f.floor || "",
 
-      roomType: user.roomType || f.roomType || "",
+        roomType: user.roomType || f.roomType || "",
 
-      roomNumber: f.roomNumber || "",
+        roomNumber: f.roomNumber || "",
 
-      bedType: user.bedType || f.bedType || "",
+        bedType: user.bedType || f.bedType || "",
 
-      bedNumber: f.bedNumber || "",
-    }));
+        bedNumber: f.bedNumber || "",
+      };
+
+      const stayFrom = f.stayFrom || prev.stayFrom;
+      const stayTo = f.stayTo || prev.stayTo;
+
+      return {
+        ...base,
+
+        stayFrom,
+
+        stayTo,
+
+        totalMonths: calculateMonths(stayFrom, stayTo),
+      };
+    });
   };
 
   /* =========================================
@@ -620,61 +491,18 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
     }));
   };
 
-  /* =========================================
-     BUILDING DATA
-  ========================================= */
-
-  const buildingOpts = [
-    ...new Set(floors.map((f) => f.building).filter(Boolean)),
-  ];
-
-  /* =========================================
-     CURRENT BUILDING
-  ========================================= */
-
-  const buildingFloors = floors.filter((f) => f.building === form.building);
-
-  const floorOpts = [
-    ...new Set(buildingFloors.map((f) => f.floor).filter(Boolean)),
-  ];
-
-  const currentFloor = floors.find(
-    (f) => f.building === form.building && f.floor === form.floor,
-  );
-
-  const rooms = currentFloor?.roomList || [];
-
-  const roomTypes = [
-    ...new Set(rooms.map((r) => (r.ac === "ac" ? "AC" : "Non-AC"))),
-  ];
-
-  const currentRoom = rooms.find((r) => r.name === form.roomNumber);
-
-  const beds = currentRoom?.beds || [];
-
-  const availableBeds = beds.filter(
-    (b) => !b.occupied || (editRow && b.admissionId === editRow.id),
-  );
-
-  const bedTypes = [
-    ...new Set(
-      availableBeds
-        .map((b) => {
-          if (!b?.type) return "";
-
-          const type = String(b.type).trim().toLowerCase();
-
-          if (type === "single") return "Single";
-
-          if (type === "double") return "Double";
-
-          return b.type;
-        })
-        .filter(Boolean),
-    ),
-  ];
-
   const selectedBank = banks.find((b) => String(b.id) === String(form.bankId));
+
+  /* ===== TOTAL — amount + GST ===== */
+
+  const gstAmount = form.includeGst
+    ? ((Number(form.amountPaid) || 0) * (Number(form.gstPercent) || 0)) / 100
+    : 0;
+
+  const totalAmount = form.includeGst
+    ? (Number(form.amountPaid) || 0) + gstAmount
+    : "";
+
   const reset = () => {
     setForm({
       ...empty,
@@ -686,88 +514,19 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
 
     const list = loadJson(ADM_KEY, []);
 
-    const dup = list.find(
-      (a) =>
-        a &&
-        a.status !== "Cancelled" &&
-        (!editRow || a.id !== editRow.id) &&
-        ((form.userNo && a.userNo === form.userNo) ||
-          (form.mobile && a.mobile === form.mobile) ||
-          (form.studentName &&
-            String(a.studentName || "")
-              .trim()
-              .toLowerCase() === form.studentName.trim().toLowerCase())),
-    );
-
-    if (dup) {
-      alert(
-        `This student already has an admission (${dup.userNo || dup.studentName}).`,
-      );
-      return;
-    }
-
     if (editRow) {
       const updatedList = list.map((r) =>
-        r.id === editRow.id ? { ...r, ...form, bank: selectedBank || null } : r,
+        r.id === editRow.id
+          ? {
+              ...r,
+              ...form,
+              totalAmount: totalAmount || "",
+              bank: selectedBank || null,
+            }
+          : r,
       );
 
       localStorage.setItem(ADM_KEY, JSON.stringify(updatedList));
-
-      const clearedFloors = loadJson(FLOOR_KEY, []).map((floor) => ({
-        ...floor,
-
-        roomList: (floor.roomList || []).map((room) => ({
-          ...room,
-
-          beds: (room.beds || []).map((bed) =>
-            bed.admissionId === editRow.id
-              ? {
-                  ...bed,
-                  occupied: false,
-                  occupiedBy: null,
-                  userNo: null,
-                  admissionId: null,
-                }
-              : bed,
-          ),
-        })),
-      }));
-
-      const editedFloors = clearedFloors.map((floor) => {
-        if (floor.building !== form.building || floor.floor !== form.floor) {
-          return floor;
-        }
-
-        return {
-          ...floor,
-
-          roomList: (floor.roomList || []).map((room) => {
-            if (room.name !== form.roomNumber) {
-              return room;
-            }
-
-            return {
-              ...room,
-
-              beds: (room.beds || []).map((bed) => {
-                if (String(bed.number) === String(form.bedNumber)) {
-                  return {
-                    ...bed,
-                    occupied: true,
-                    occupiedBy: form.studentName,
-                    userNo: form.userNo,
-                    admissionId: editRow.id,
-                  };
-                }
-
-                return bed;
-              }),
-            };
-          }),
-        };
-      });
-
-      localStorage.setItem(FLOOR_KEY, JSON.stringify(editedFloors));
 
       window.dispatchEvent(new Event("hostel-data-updated"));
 
@@ -784,56 +543,42 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
       return;
     }
 
+    /* ===== NEW ADMISSION — first fees ===== */
+
+    const dup = list.find(
+      (a) =>
+        a &&
+        a.status !== "Cancelled" &&
+        ((form.userNo && a.userNo === form.userNo) ||
+          (form.mobile && a.mobile === form.mobile) ||
+          (form.studentName &&
+            String(a.studentName || "")
+              .trim()
+              .toLowerCase() === form.studentName.trim().toLowerCase())),
+    );
+
+    if (dup) {
+      alert(
+        `This student already has an admission (${dup.userNo || dup.studentName}).`,
+      );
+      return;
+    }
+
     const row = {
       id: Date.now(),
       ...form,
+      totalAmount: totalAmount || "",
       bank: selectedBank || null,
       status: "Active",
     };
 
     localStorage.setItem(ADM_KEY, JSON.stringify([...list, row]));
-    const latestFloors = loadJson(FLOOR_KEY, []);
 
-    const updatedFloors = latestFloors.map((floor) => {
-      if (floor.building !== form.building || floor.floor !== form.floor) {
-        return floor;
-      }
-
-      return {
-        ...floor,
-
-        roomList: (floor.roomList || []).map((room) => {
-          if (room.name !== form.roomNumber) {
-            return room;
-          }
-
-          return {
-            ...room,
-
-            beds: (room.beds || []).map((bed) => {
-              if (String(bed.number) === String(form.bedNumber)) {
-                return {
-                  ...bed,
-                  occupied: true,
-                  occupiedBy: form.studentName,
-                  userNo: form.userNo,
-                  admissionId: row.id,
-                };
-              }
-
-              return bed;
-            }),
-          };
-        }),
-      };
-    });
-
-    localStorage.setItem(FLOOR_KEY, JSON.stringify(updatedFloors));
     window.dispatchEvent(new Event("hostel-data-updated"));
 
     window.dispatchEvent(new Event("admission-updated"));
 
-    alert("Admission saved successfully and bed allocated.");
+    alert("Admission saved successfully.");
 
     reset();
   };
@@ -842,7 +587,7 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
     <form className="af" onSubmit={save}>
       <div className="af-grid">
         {/* ================= STUDENT NAME ================= */}
-        <Field label="Student Name" required>
+        <Field label="Student Name" required pillOnValue>
           <SearchableUserSelect
             value={form.userNo}
             users={users}
@@ -856,183 +601,25 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
             required
           />
         </Field>
-        {/* ================= EMAIL ================= */}
-        <Field label="Email" required>
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={set}
-            required
-          />
+        {/* ================= MOBILE (autofill) ================= */}
+        <Field label="Mobile No">
+          <input name="mobile" value={form.mobile} readOnly />
         </Field>
-        {/* ================= MOBILE ================= */}
-        <Field label="Mobile No" required>
-          <input name="mobile" value={form.mobile} onChange={set} required />
+        {/* ================= BUILDING (autofill) ================= */}
+        <Field label="Building Name">
+          <input name="building" value={form.building} readOnly />
         </Field>
-        {/* ================= BUILDING ================= */}
-        <Field label="Building Name" required>
-          <select
-            name="building"
-            value={form.building}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                building: e.target.value,
-                floor: "",
-                roomNumber: "",
-                bedType: "",
-                bedNumber: "",
-              }))
-            }
-            required
-          >
-            <option value=""></option>
+        {/* ================= ROOM NUMBER (autofill) ================= */}
+        <Field label="Room No">
+          <input name="roomNumber" value={form.roomNumber} readOnly />
+        </Field>
+        {/* ================= BED NUMBER (autofill) ================= */}
+        <Field label="Bed No">
+          <input name="bedNumber" value={form.bedNumber} readOnly />
+        </Field>
 
-            {buildingOpts.map((building) => (
-              <option key={building} value={building}>
-                {building}
-              </option>
-            ))}
-          </select>
-        </Field>
-        {/* ================= FLOOR ================= */}
-        <Field label="Floor" required>
-          <select
-            name="floor"
-            value={form.floor}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                floor: e.target.value,
-                roomNumber: "",
-                bedType: "",
-                bedNumber: "",
-              }))
-            }
-            required
-            disabled={!form.building}
-          >
-            <option value=""></option>
+        {/* ================= ADMISSION DETAILS ================= */}
 
-            {floorOpts.map((floor) => (
-              <option key={floor} value={floor}>
-                {floor}
-              </option>
-            ))}
-          </select>
-        </Field>
-        {/* ================= ROOM TYPE ================= */}
-        <Field label="Room Type" required>
-          <select
-            name="roomType"
-            value={form.roomType}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                roomType: e.target.value,
-                roomNumber: "",
-                bedType: "",
-                bedNumber: "",
-              }))
-            }
-            required
-            disabled={!form.floor}
-          >
-            <option value=""></option>
-
-            {roomTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </Field>
-        {/* ================= ROOM NUMBER ================= */}
-        <Field label="Room Number" required>
-          <select
-            name="roomNumber"
-            value={form.roomNumber}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                roomNumber: e.target.value,
-                bedType: "",
-                bedNumber: "",
-              }))
-            }
-            required
-            disabled={!form.roomType}
-          >
-            <option value=""></option>
-
-            {rooms
-              .filter((r) =>
-                form.roomType === "AC" ? r.ac === "ac" : r.ac === "nonac",
-              )
-              .map((r) => (
-                <option key={r.id || r.name} value={r.name}>
-                  {r.name}
-                </option>
-              ))}
-          </select>
-        </Field>
-        {/* ================= BED TYPE ================= */}
-        <Field label="Bed Type" required>
-          <select
-            name="bedType"
-            value={form.bedType}
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                bedType: e.target.value,
-                bedNumber: "",
-              }))
-            }
-            required
-            disabled={!form.roomNumber}
-          >
-            <option value="">Select Bed Type</option>
-
-            {bedTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </Field>
-        {/* ================= BED NUMBER ================= */}
-        <Field label="Bed Number" required>
-          <select
-            name="bedNumber"
-            value={form.bedNumber}
-            onChange={set}
-            required
-            disabled={!form.bedType}
-          >
-            <option value="">Select Bed Number</option>
-
-            {availableBeds
-              .filter((b) => {
-                const type = String(b?.type || "")
-                  .trim()
-                  .toLowerCase();
-
-                return (
-                  type ===
-                  String(form.bedType || "")
-                    .trim()
-                    .toLowerCase()
-                );
-              })
-              .map((b) => (
-                <option key={b.id || b.number} value={b.number}>
-                  {b.number}
-                </option>
-              ))}
-          </select>
-        </Field>
-        {/* ================= ADMISSION DATE ================= */}
         <Field label="Admission Date" required>
           <input
             type="date"
@@ -1042,7 +629,7 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
             required
           />
         </Field>
-        {/* ================= STAY FROM ================= */}
+
         <Field label="Stay From" required>
           <input
             type="date"
@@ -1052,7 +639,7 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
             required
           />
         </Field>
-        {/* ================= STAY TO ================= */}
+
         <Field label="Stay To" required>
           <input
             type="date"
@@ -1062,184 +649,9 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
             required
           />
         </Field>
-        {/* ================= TOTAL MONTHS ================= */}
-        <Field label="Total Months" required>
-          <input
-            value={
-              form.totalMonths
-                ? `${form.totalMonths} Month${
-                    Number(form.totalMonths) > 1 ? "s" : ""
-                  }`
-                : ""
-            }
-            readOnly
-            placeholder="Months"
-            required
-          />
-        </Field>
-        {/* ================= MONTHLY RENT ================= */}
-        <Field label="Monthly Rent" required>
-          <input
-            type="number"
-            min="0"
-            name="monthlyRent"
-            value={form.monthlyRent}
-            onChange={set}
-            placeholder="Enter rent"
-            required
-          />
-        </Field>
-        {/* ================= TOTAL AMOUNT ================= */}
-        <Field label="Total Amount" required>
-          <input
-            value={formatMoney(form.totalAmount)}
-            readOnly
-            placeholder="Amount"
-            required
-          />
-        </Field>
-        {/* ================= PAYMENT MODE ================= */}
-        <Field label="Payment Mode" required>
-          <select
-            name="paymentMode"
-            value={form.paymentMode}
-            onChange={(e) => {
-              setForm((prev) => ({
-                ...prev,
-                paymentMode: e.target.value,
-                txnId: "",
-                bankId: "",
-              }));
-            }}
-            required
-          >
-            <option value=""></option>
-            <option>Cash</option>
-            <option>UPI</option>
-            <option>Online</option>
-            <option>Bank</option>
-            <option>Bank Transfer</option>
-            <option>Cheque</option>
-          </select>
-        </Field>
-        {/* ================= PAYMENT REFERENCE ================= */}
-        {form.paymentMode === "UPI" ||
-        form.paymentMode === "Online" ||
-        form.paymentMode === "Bank Transfer" ? (
-          <Field label="Transaction ID" required>
-            <input
-              name="txnId"
-              value={form.txnId}
-              onChange={set}
-              placeholder="Enter transaction ID"
-              required
-            />
-          </Field>
-        ) : form.paymentMode === "Cheque" ? (
-          <Field label="Cheque No." required>
-            <input
-              name="txnId"
-              value={form.txnId}
-              onChange={set}
-              placeholder="Enter cheque number"
-              required
-            />
-          </Field>
-        ) : (
-          <div className="af-payment-note">
-            <span>Payment Reference</span>
 
-            <strong>
-              {form.paymentMode === "Cash" || form.paymentMode === "Bank"
-                ? "Not required"
-                : "Select payment mode"}
-            </strong>
-          </div>
-        )}
-        {/* ================= GST CHECK ================= */}
-        <div className="af-gst-row">
-          <label className="af-gst-check">
-            <input
-              type="checkbox"
-              name="includeGst"
-              checked={form.includeGst}
-              onChange={set}
-            />
+        {/* ================= PAYMENT ================= */}
 
-            <span> GST</span>
-          </label>
-        </div>
-        {/* ================= BANK ================= */}
-        {form.paymentMode === "Bank" && (
-          <>
-            <Field label="Bank Name" required>
-              <select
-                name="bankId"
-                value={form.bankId}
-                onChange={onBank}
-                required
-              >
-                <option value="">Select Bank</option>
-
-                {banks.map((bank) => (
-                  <option key={bank.id} value={bank.id}>
-                    {bank.bankName}
-                  </option>
-                ))}
-              </select>
-            </Field>
-
-            {selectedBank && (
-              <>
-                <Field label="Account Holder">
-                  <input value={selectedBank.accountHolder || ""} readOnly />
-                </Field>
-
-                <Field label="Account Number">
-                  <input value={selectedBank.accountNumber || ""} readOnly />
-                </Field>
-
-                <Field label="IFSC Code">
-                  <input value={selectedBank.ifsc || ""} readOnly />
-                </Field>
-
-                {selectedBank.branch && (
-                  <Field label="Branch">
-                    <input value={selectedBank.branch || ""} readOnly />
-                  </Field>
-                )}
-
-                {selectedBank.upiId && (
-                  <Field label="UPI ID">
-                    <input value={selectedBank.upiId || ""} readOnly />
-                  </Field>
-                )}
-              </>
-            )}
-          </>
-        )}
-        {/* ================= GST AMOUNT ================= */}
-        {form.includeGst && (
-          <Field label="GST Amount" required>
-            <input
-              value={formatMoney(form.gstAmount)}
-              readOnly
-              placeholder="Auto calculated"
-              required
-            />
-          </Field>
-        )}
-        {/* ================= GRAND TOTAL ================= */}
-        <Field label="Grand Total" required>
-          <input
-            className="af-grand-total-input"
-            value={formatMoney(form.grandTotal)}
-            readOnly
-            placeholder="Auto calculated"
-            required
-          />
-        </Field>
-        {/* ================= AMOUNT PAID ================= */}
         <Field label="Amount Paid" required>
           <input
             type="number"
@@ -1251,118 +663,213 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
             required
           />
         </Field>
-        {/* ================= PAYMENT STATUS ================= */}
+
         <Field label="Payment Status" required>
-          <div
-            className={`af-status ${
-              form.paymentStatus ? form.paymentStatus.toLowerCase() : "empty"
-            }`}
-          >
-            {form.paymentStatus || "Auto calculated"}
-          </div>
-        </Field>
-        {/* ================= SOURCE ================= */}
-        <Field label="Source" required>
           <select
-            name="sources"
-            value={form.sources}
+            name="paymentStatus"
+            value={form.paymentStatus}
             onChange={(e) => {
+              const status = e.target.value;
+
               setForm((prev) => ({
                 ...prev,
-                sources: e.target.value,
-                sourceDetails: "",
+                paymentStatus: status,
+                dueDate: "",
+                rentMonth: "",
+                paymentMode: "",
+                bankId: "",
+                txnId: "",
               }));
             }}
             required
           >
             <option value=""></option>
-            <option>Walk-in</option>
-            <option>Online</option>
-            <option>Referral</option>
-            <option>Other</option>
+            <option>Installment</option>
+            <option>Monthly</option>
+            <option>Completed</option>
+            <option>Pending</option>
           </select>
         </Field>
-        {/* ================= ONLINE ================= */}
-        {form.sources === "Online" && (
-          <Field label="Online Source" required>
-            <select
-              name="sourceDetails"
-              value={form.sourceDetails}
+
+        {/* ===== GST (normal checkbox — image sarkha) ===== */}
+
+        <div className="af-field">
+          <label
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 7,
+              width: "100%",
+              height: 36,
+              cursor: "pointer",
+              userSelect: "none",
+            }}
+          >
+            <input
+              type="checkbox"
+              name="includeGst"
+              checked={form.includeGst}
+              onChange={(e) => {
+                const checked = e.target.checked;
+
+                setForm((prev) => ({
+                  ...prev,
+                  includeGst: checked,
+                  gstPercent: checked ? prev.gstPercent : "",
+                  gstNo: checked ? prev.gstNo : "",
+                }));
+              }}
+            />
+
+            <span style={{ fontSize: 11, fontWeight: 500, color: "#3f4c63" }}>
+              GST
+            </span>
+          </label>
+        </div>
+
+        {form.includeGst && (
+          <>
+            <Field label="GST %" required>
+              <input
+                type="number"
+                min="0"
+                name="gstPercent"
+                value={form.gstPercent}
+                onChange={set}
+                placeholder="Enter GST %"
+                required
+              />
+            </Field>
+
+            <Field label="GST No" required>
+              <input
+                type="text"
+                name="gstNo"
+                value={form.gstNo}
+                onChange={set}
+                placeholder="Enter GST number"
+                required
+              />
+            </Field>
+
+            <Field label="Total Amount" required>
+              <input value={totalAmount || ""} readOnly required />
+            </Field>
+          </>
+        )}
+
+        {/* ===== CONDITIONAL FIELDS (status var) ===== */}
+
+        {form.paymentStatus === "Installment" && (
+          <Field label="Due Date" required>
+            <input
+              type="date"
+              name="dueDate"
+              value={form.dueDate}
               onChange={set}
+              required
+            />
+          </Field>
+        )}
+
+        {form.paymentStatus === "Monthly" && (
+          <Field label="Month" required>
+            <input
+              type="month"
+              name="rentMonth"
+              value={form.rentMonth}
+              onChange={set}
+              required
+            />
+          </Field>
+        )}
+
+        {form.paymentStatus === "Completed" && (
+          <Field label="Payment Mode" required>
+            <select
+              name="paymentMode"
+              value={form.paymentMode}
+              onChange={(e) => {
+                setForm((prev) => ({
+                  ...prev,
+                  paymentMode: e.target.value,
+                  bankId: "",
+                  txnId: "",
+                }));
+              }}
               required
             >
               <option value=""></option>
-              <option>Website</option>
-              <option>Google</option>
-              <option>Instagram</option>
-              <option>Facebook</option>
-              <option>YouTube</option>
-              <option>Other</option>
+              <option>Cash</option>
+              <option>UPI</option>
+              <option>Online</option>
+              <option>Bank</option>
+              <option>Bank Transfer</option>
+              <option>Cheque</option>
             </select>
           </Field>
         )}
-        {/* ================= REFERRAL ================= */}
-        {form.sources === "Referral" && (
-          <Field label="Referred By" required>
+        {/* ===== BANK + TRANSACTION (mode var — Cash sivay) ===== */}
+
+        {form.paymentMode && form.paymentMode !== "Cash" && (
+          <Field label="Bank Name" required>
+            <select
+              name="bankId"
+              value={form.bankId}
+              onChange={onBank}
+              required
+            >
+              <option value="">Select Bank</option>
+
+              {banks.map((bank) => (
+                <option key={bank.id} value={bank.id}>
+                  {bank.bankName}
+                </option>
+              ))}
+            </select>
+          </Field>
+        )}
+
+        {form.paymentMode && form.paymentMode !== "Cash" && selectedBank && (
+          <Field label="Transaction ID" required>
             <input
-              name="sourceDetails"
-              value={form.sourceDetails}
+              type="text"
+              name="txnId"
+              value={form.txnId}
               onChange={set}
-              placeholder="Enter person's name"
+              placeholder="Enter transaction ID"
               required
             />
           </Field>
         )}
-        {/* ================= OTHER ================= */}
-        {form.sources === "Other" && (
-          <Field label="Specify Source" required>
-            <input
-              name="sourceDetails"
-              value={form.sourceDetails}
-              onChange={set}
-              placeholder="Enter source"
-              required
-            />
-          </Field>
+
+        {form.paymentMode === "Bank" && selectedBank && (
+          <>
+            <Field label="Account Holder">
+              <input value={selectedBank.accountHolder || ""} readOnly />
+            </Field>
+
+            <Field label="Account Number">
+              <input value={selectedBank.accountNumber || ""} readOnly />
+            </Field>
+
+            <Field label="IFSC Code">
+              <input value={selectedBank.ifsc || ""} readOnly />
+            </Field>
+
+            {selectedBank.branch && (
+              <Field label="Branch">
+                <input value={selectedBank.branch || ""} readOnly />
+              </Field>
+            )}
+
+            {selectedBank.upiId && (
+              <Field label="UPI ID">
+                <input value={selectedBank.upiId || ""} readOnly />
+              </Field>
+            )}
+          </>
         )}
-        {/* ================= SIGNATURE ================= */}
-        <div className="af-field af-file">
-          <span className="af-label">
-            Authorized Signature
-            <em>*</em>
-          </span>
-
-          <input
-            type="file"
-            accept="image/*"
-            name="signature"
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                signature: e.target.files?.[0]?.name || "",
-              }))
-            }
-          />
-        </div>
-        {/* ================= POLICE VERIFICATION ================= */}
-        <div className="af-field af-file">
-          <span className="af-label">
-            Police Verification
-            <em>*</em>
-          </span>
-
-          <input
-            type="file"
-            accept="application/pdf"
-            name="policeVerification"
-            onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                policeVerification: e.target.files?.[0]?.name || "",
-              }))
-            }
-          />
-        </div>
       </div>
       {/* ================= ACTIONS ================= */}
       <div className="af-actions">
