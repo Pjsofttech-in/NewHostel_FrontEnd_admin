@@ -1,66 +1,84 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import federation from '@originjs/vite-plugin-federation';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import federation from "@originjs/vite-plugin-federation";
 
 export default defineConfig({
-  // base:'/layringhosteladmin/',
+  base: "/layringhosteladmin/",
+
   plugins: [
     react(),
     federation({
-      name: "Hostel Admin",
-      filename: "remoteEntry.js",
+      name: "hostelAdmin",
+
+      // ── All components the superadmin host can import ──────────────────────
       exposes: {
-        "./hostelAdminSidebar": "./src/App.jsx",
-        "./HostelInquieySetting": "./src/Components/HostelInquieySetting.jsx",
-        "./InquiryReportDashboard": "./src/Components/Enquiries/InquiryReportDashboard.jsx",
-        "./HostelEnquiry": "./src/Components/Enquiries/InquiryForm/HostelEnquiry.jsx",
-        "./InquiryReport": "./src/Components/Enquiries/InquiryReport.jsx",
-        "./AdmissionsTabs": "./src/Components/AdmissionsTabs.jsx",
-        "./AdmissionFormDashboard": "./src/Components/Admissions/AdmissionFormDashboard.jsx",
-        "./AdmissionForm": "./src/Components/Admissions/AdmissionForm.jsx",
-        "./AdmissionReport": "./src/Components/Admissions/AdmissionReport.jsx",
-        "./RegistrationForm": "./src/Components/Users/RegistrationForm/RegistrationForm.jsx",
-        "./UsersList": "./src/Components/Users/UsersList/UsersList.jsx",
-        "./AdmissionSettings": "./src/Components/AdmissionSettings.jsx",
-        "./DynamicWebsite": "./src/Components/DynamicWebsite/DynamicWebsite.jsx",
-        "./WebsiteUrl": "./src/Components/DynamicWebsite/WebsiteUrl.jsx",
-        "./Slidebar": "./src/Components/DynamicWebsite/Slidebar/Slidebar.jsx",
-        "./Footer": "./src/Components/DynamicWebsite/Footer/Footer.jsx",
-        "./WebsiteSettings": "./src/Components/DynamicWebsite/WebsiteSettings.jsx",
-        "./DisplayAdmissionFormDetails": "./src/Components/Users/UsersList/DisplayAdmissionFormDetails.jsx",
+        // Layout shells (contain <Outlet>)
+        "./HostelInquieySetting": "./src/remotes/HostelInquieySetting.jsx",
+        "./AdmissionsTabs": "./src/remotes/AdmissionsTabs.jsx",
+        "./DynamicWebsite": "./src/remotes/DynamicWebsite.jsx",
+
+        // Inquiry leaves
+        "./InquiryReportDashboard": "./src/remotes/InquiryReportDashboard.jsx",
+        "./HostelEnquiry": "./src/remotes/HostelEnquiry.jsx",
+        "./InquiryReport": "./src/remotes/InquiryReport.jsx",
+
+        // Admission leaves
+        "./AdmissionFormDashboard": "./src/remotes/AdmissionFormDashboard.jsx",
+        "./AdmissionForm": "./src/remotes/AdmissionForm.jsx",
+        "./AdmissionReport": "./src/remotes/AdmissionReport.jsx",
+        "./RegistrationForm": "./src/remotes/RegistrationForm.jsx",
+        "./UsersList": "./src/remotes/UsersList.jsx",
+        "./DisplayAdmissionFormDetails": "./src/remotes/DisplayAdmissionFormDetails.jsx",
+        "./AdmissionSettings": "./src/remotes/AdmissionSettings.jsx",
+
+        // Website leaves
+        "./WebsiteUrl": "./src/remotes/WebsiteUrl.jsx",
+        "./Slidebar": "./src/remotes/Slidebar.jsx",
+        "./Footer": "./src/remotes/Footer.jsx",
+        "./WebsiteSettings": "./src/remotes/WebsiteSettings.jsx",
+
+
+        "./HostelDashboard": "./src/pages/Dashboard/Dashboard.jsx",
+
+
+
       },
+
+      // ── Shared with the host (must match host's shared config) ─────────────
       shared: {
-        react: { singleton: true, eager: true, requiredVersion: "^18.2.0" },
-        "react-dom": { singleton: true, eager: true, requiredVersion: "^18.2.0" },
-        "react-router-dom": { singleton: true, eager: true, requiredVersion: "^6.22.3" },
-        "@mui/material": { singleton: true, eager: false, requiredVersion: "^5.15.13" }, // lazy-load MUI
-        "@mui/icons-material": { singleton: true, eager: false, requiredVersion: "^5.15.13" },
-        "@emotion/react": { singleton: true, eager: false, requiredVersion: "^11.11.1" },
-        "@emotion/styled": { singleton: true, eager: false, requiredVersion: "^11.11.0" },
-        antd: { singleton: true, eager: false, requiredVersion: "^5.24.7" }, // lazy-load AntD
-        axios: { singleton: true, eager: false },
-        sweetalert2: { singleton: true, eager: false },
+        react: {
+          singleton: true,
+          eager: true,
+          requiredVersion: "^18.2.0",
+        },
+        "react-dom": {
+          singleton: true,
+          eager: true,
+          requiredVersion: "^18.2.0",
+        },
+        "react-router-dom": {
+          singleton: true,
+          eager: true,
+          requiredVersion: "^6.22.3",
+        },
       },
     }),
   ],
-  build: {
-    modulePreload: true,
-    target: "esnext",
-    minify: "esbuild",
-    cssCodeSplit: true,
-    sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          react: ["react", "react-dom"],
-          mui: ["@mui/material", "@mui/icons-material", "@emotion/react", "@emotion/styled"],
-          antd: ["antd"],
-        },
-      },
-    },
-  },
+
   server: {
-    port: 5001,
-    strictPort: true,
+    port: 5014,
+    cors: true,
+  },
+
+  preview: {
+    port: 5014,
+    cors: true,
+  },
+
+  build: {
+    modulePreload: false,
+    target: "esnext",
+    minify: false,
+    cssCodeSplit: false,
   },
 });

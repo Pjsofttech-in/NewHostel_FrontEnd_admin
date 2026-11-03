@@ -1,0 +1,977 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+.inquiry-dashboard {
+  font-family:
+    "Poppins",
+    "Segoe UI",
+    system-ui,
+    -apple-system,
+    sans-serif;
+
+  min-height: 100vh;
+  padding: 14px;
+  box-sizing: border-box;
+  background: #eef2f7;
+}
+
+.inquiry-dashboard button,
+.inquiry-dashboard input,
+.inquiry-dashboard select {
+  font-family: inherit;
+}
+
+/* ================= SUMMARY ================= */
+
+.inquiry-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.inq-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 82px;
+  padding: 10px 14px;
+  color: white;
+  border-radius: 11px;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.inq-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(15, 23, 42, 0.12);
+}
+
+.inq-card.yellow {
+  background: #eab308;
+}
+
+.inq-card.red {
+  background: #ef4444;
+}
+
+.inq-card.blue {
+  background: #2563eb;
+}
+
+.inq-card.green {
+  background: #16a34a;
+}
+
+.inq-card.purple {
+  background: #7c3aed;
+}
+
+.inq-card-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.inq-card-content span {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.card-two-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3px;
+}
+
+.card-two-row small {
+  font-size: 10px;
+  opacity: 0.88;
+  font-weight: 500;
+}
+
+.card-two-row strong {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* ================= ANALYTICS ================= */
+
+.inquiry-analytics {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.analytics-card {
+  background: white;
+  border: 1px solid #e5eaf1;
+  border-radius: 11px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+}
+
+/* ================= HEADER ================= */
+
+.analytics-header {
+  min-height: 85px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 20px;
+
+  padding: 18px 20px;
+
+  border-bottom: 1px solid #e8ebf1;
+}
+
+.analytics-header h2 {
+  margin: 0;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  color: #1e293b;
+}
+
+.analytics-header p {
+  margin: 3px 0 0;
+
+  color: #94a3b8;
+
+  font-size: 11px;
+}
+
+.selected-range-total {
+  display: block;
+
+  margin-top: 5px;
+
+  color: #2563eb;
+
+  font-size: 12px;
+}
+
+/* ================= TIMEFRAME SELECTOR ================= */
+
+.timeframe-selector {
+  display: flex;
+
+  padding: 4px;
+
+  border-radius: 10px;
+
+  background: #f3f5f9;
+
+  flex-shrink: 0;
+}
+
+.timeframe-selector button {
+  min-width: 54px;
+
+  padding: 7px 10px;
+
+  border: 0;
+
+  border-radius: 7px;
+
+  background: transparent;
+
+  color: #58657e;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.timeframe-selector button.active {
+  background: white;
+
+  color: #2563eb;
+
+  box-shadow: 0 2px 7px rgba(31, 55, 94, 0.1);
+}
+
+/* ================= CUSTOM DATE ================= */
+
+.custom-date-panel {
+  display: flex;
+
+  align-items: end;
+
+  gap: 14px;
+
+  padding: 14px 20px;
+
+  background: #fafbfe;
+
+  border-bottom: 1px solid #e8ebf1;
+}
+
+.date-field {
+  display: grid;
+
+  gap: 5px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  color: #64748b;
+}
+
+.date-input-wrap {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  height: 32px;
+
+  padding: 0 10px;
+
+  background: white;
+
+  border: 1px solid #dce2ea;
+
+  border-radius: 6px;
+
+  color: #2563eb;
+}
+
+.date-input-wrap input {
+  border: 0;
+  outline: 0;
+
+  color: #334155;
+
+  background: transparent;
+
+  font-size: 11px;
+
+  font-family: inherit;
+}
+
+.apply-date-btn {
+  height: 32px;
+
+  padding: 0 18px;
+
+  background: #2563eb;
+
+  color: white;
+
+  border: 0;
+
+  border-radius: 6px;
+
+  font-size: 11px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.apply-date-btn:hover {
+  background: #1d4ed8;
+}
+
+/* =========================================================
+   MAIN TREND CHART
+========================================================= */
+
+.trend-chart {
+  display: flex;
+
+  height: 280px;
+
+  padding: 16px 18px 12px;
+
+  box-sizing: border-box;
+}
+
+.trend-y-axis {
+  width: 42px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  align-items: flex-end;
+
+  padding: 0 8px 25px 0;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+
+  flex-shrink: 0;
+}
+
+.trend-area {
+  position: relative;
+
+  flex: 1;
+
+  min-width: 0;
+
+  overflow: hidden;
+}
+
+.trend-grid {
+  position: absolute;
+
+  inset: 0 0 25px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  pointer-events: none;
+}
+
+.trend-grid span {
+  border-top: 1px dashed #edf0f4;
+}
+
+/* =========================================================
+   TREND BARS
+========================================================= */
+
+.trend-bars {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+
+  display: flex;
+
+  gap: 10px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: thin;
+
+  scrollbar-color: #cbd5e1 #f1f5f9;
+
+  align-items: stretch;
+}
+
+.trend-bars::-webkit-scrollbar {
+  height: 6px;
+}
+
+.trend-bars::-webkit-scrollbar-track {
+  background: #f1f5f9;
+
+  border-radius: 6px;
+}
+
+.trend-bars::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+
+  border-radius: 6px;
+}
+
+/* =========================================================
+   COLUMN
+========================================================= */
+
+.trend-column {
+  flex: 1 0 28px;
+
+  min-width: 28px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  height: 100%;
+
+  box-sizing: border-box;
+}
+
+.trend-count {
+  height: 20px;
+
+  flex-shrink: 0;
+
+  font-size: 10px;
+
+  color: #475569;
+
+  font-weight: 600;
+}
+
+.trend-bar-wrap {
+  flex: 1;
+
+  width: 100%;
+
+  display: flex;
+
+  align-items: end;
+
+  justify-content: center;
+
+  min-height: 0;
+}
+
+.trend-bar {
+  width: min(38px, 62%);
+
+  min-height: 3px;
+
+  background: #2563eb;
+
+  border-radius: 4px 4px 0 0;
+
+  transition: height 0.3s ease;
+}
+
+.trend-bar:hover {
+  background: #1d4ed8;
+}
+
+.trend-day {
+  height: 18px;
+
+  flex-shrink: 0;
+
+  padding-top: 4px;
+
+  font-size: 10px;
+
+  color: #94a3b8;
+
+  white-space: nowrap;
+}
+
+.main-day-chart .trend-area {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.main-day-chart .trend-bars.trend-day {
+  gap: 8px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  padding: 0 0 24px;
+  box-sizing: border-box;
+
+  align-items: stretch;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Fixed width for each hour */
+.main-day-chart .trend-bars.trend-day .trend-column {
+  flex: 0 0 42px;
+
+  width: 42px;
+
+  min-width: 42px;
+
+  max-width: 42px;
+
+  height: 100%;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  box-sizing: border-box;
+}
+
+/* Count */
+.main-day-chart .trend-bars.trend-day .trend-count {
+  height: 20px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  font-size: 10px;
+
+  font-weight: 600;
+
+  color: #475569;
+}
+
+/* Bar area */
+.main-day-chart .trend-bars.trend-day .trend-bar-wrap {
+  flex: 1 1 auto;
+
+  width: 100%;
+
+  min-height: 0;
+
+  display: flex;
+
+  align-items: flex-end;
+
+  justify-content: center;
+
+  border-bottom: 1px solid #cbd5e1;
+  box-sizing: border-box;
+}
+
+/* Bar */
+.main-day-chart .trend-bars.trend-day .trend-bar {
+  width: 26px;
+
+  max-width: 26px;
+
+  min-height: 4px;
+
+  background: #2563eb;
+
+  border-radius: 5px 5px 0 0;
+
+  transition: height 0.3s ease;
+}
+
+.main-day-chart .trend-bars.trend-day .trend-bar:hover {
+  background: #1d4ed8;
+}
+
+/* Hour label */
+.main-day-chart .trend-bars.trend-day .trend-day {
+  height: 22px;
+
+  flex-shrink: 0;
+
+  padding-top: 4px;
+
+  font-size: 9px;
+
+  color: #94a3b8;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  white-space: nowrap;
+}
+
+/* Main Day scrollbar */
+.main-day-chart .trend-bars.trend-day::-webkit-scrollbar {
+  height: 6px;
+}
+
+.main-day-chart .trend-bars.trend-day::-webkit-scrollbar-track {
+  background: #f1f5f9;
+
+  border-radius: 6px;
+}
+
+.main-day-chart .trend-bars.trend-day::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+
+  border-radius: 6px;
+}
+
+.main-day-chart .trend-bars.trend-day::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-chart {
+  width: 100%;
+
+  display: grid;
+
+  place-content: center;
+
+  gap: 12px;
+
+  color: #94a3b8;
+}
+
+/* =========================================================
+   LOWER ROW
+========================================================= */
+
+.inquiry-lower {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 14px;
+
+  margin-top: 14px;
+}
+
+/* =========================================================
+   TIMEFRAME GRAPH
+========================================================= */
+
+.tf-chart {
+  height: 200px;
+
+  padding: 12px 14px 10px;
+}
+
+.tf-chart .trend-y-axis {
+  width: 30px;
+
+  font-size: 9px;
+}
+
+.tf-chart .trend-bars {
+  gap: 2px;
+}
+
+.tf-chart .trend-column {
+  flex: 1 0 13px;
+
+  min-width: 13px;
+}
+
+.tf-chart .trend-bar {
+  width: min(20px, 78%);
+}
+
+.tf-chart .trend-day {
+  height: 16px;
+
+  padding-top: 3px;
+
+  font-size: 8.5px;
+}
+
+/* =========================================================
+   TIMEFRAME - TODAY
+   24 HOURS
+   12 VISIBLE + 12 ON SCROLL
+========================================================= */
+
+.tf-chart .trend-bars.trend-day {
+  gap: 5px;
+
+  overflow-x: auto;
+
+  overflow-y: hidden;
+
+  padding-bottom: 2px;
+
+  box-sizing: border-box;
+
+  align-items: stretch;
+}
+
+/* Each hour */
+.tf-chart .trend-bars.trend-day .trend-column {
+  flex: 0 0 28px;
+
+  width: 28px;
+
+  min-width: 28px;
+
+  max-width: 28px;
+
+  height: 100%;
+}
+
+/* Count */
+.tf-chart .trend-bars.trend-day .trend-count {
+  height: 18px;
+
+  font-size: 9px;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: center;
+}
+
+/* Bar */
+.tf-chart .trend-bars.trend-day .trend-bar {
+  width: 18px;
+
+  max-width: 18px;
+
+  min-height: 3px;
+}
+
+/* Hour label */
+.tf-chart .trend-bars.trend-day .trend-day {
+  height: 17px;
+
+  padding-top: 3px;
+
+  font-size: 8px;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: center;
+
+  white-space: nowrap;
+}
+
+/* Timeframe scrollbar */
+.tf-chart .trend-bars.trend-day::-webkit-scrollbar {
+  height: 5px;
+}
+
+.tf-chart .trend-bars.trend-day::-webkit-scrollbar-track {
+  background: #f1f5f9;
+
+  border-radius: 5px;
+}
+
+.tf-chart .trend-bars.trend-day::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+
+  border-radius: 5px;
+}
+
+/* =========================================================
+   LOWER ROW COMPACT
+========================================================= */
+
+.status-list {
+  padding: 10px 20px 12px;
+}
+
+.inquiry-lower .analytics-header {
+  min-height: 0;
+
+  padding: 12px 20px;
+}
+
+.inquiry-lower .analytics-header h2 {
+  font-size: 14px;
+}
+
+.inquiry-lower .analytics-header p {
+  margin-top: 2px;
+
+  font-size: 10px;
+}
+
+.inquiry-lower .timeframe-selector button {
+  min-width: 46px;
+
+  padding: 5px 8px;
+
+  font-size: 10px;
+}
+
+.inquiry-lower .status-row {
+  padding: 4px 0;
+}
+
+.inquiry-lower .timeframe-selector button:last-child {
+  min-width: 65px;
+}
+
+.inquiry-lower .status-info {
+  margin-bottom: 3px;
+
+  font-size: 11px;
+}
+
+.inquiry-lower .status-progress {
+  height: 5px;
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.status-row {
+  padding: 8px 0;
+}
+
+.status-info {
+  display: flex;
+
+  justify-content: space-between;
+
+  margin-bottom: 7px;
+
+  color: #475569;
+
+  font-size: 12px;
+}
+
+.status-progress {
+  height: 6px;
+
+  background: #eef1f5;
+
+  border-radius: 6px;
+
+  overflow: hidden;
+}
+
+.status-progress-fill {
+  height: 100%;
+
+  background: #2563eb;
+
+  transition: width 0.3s ease;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+  .inquiry-summary {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .inquiry-analytics {
+    grid-template-columns: 1fr;
+  }
+
+  .inquiry-lower {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .inquiry-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analytics-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .timeframe-selector {
+    width: 100%;
+
+    overflow-x: auto;
+  }
+
+  .timeframe-selector button {
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .inquiry-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .inquiry-dashboard {
+    padding: 8px;
+  }
+
+  .analytics-header {
+    padding: 14px;
+  }
+
+  .trend-chart {
+    padding: 12px 10px 10px;
+  }
+
+  .custom-date-panel {
+    flex-direction: column;
+
+    align-items: stretch;
+
+    padding: 12px 14px;
+  }
+
+  .apply-date-btn {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   TIMEFRAME - 5 SUMMARY BARS
+   Today | 7 Days | 30 Days | 365 Days | Total
+========================================================= */
+.tf-summary-bars {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: space-around !important;
+  gap: 18px !important;
+  overflow: hidden !important;
+  padding: 0 10px !important;
+  height: 100% !important;
+  box-sizing: border-box;
+}
+
+.tf-summary-bars .trend-column {
+  flex: 1 1 0 !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 90px !important;
+  height: 100% !important;
+}
+
+.tf-summary-bars .trend-count {
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.tf-summary-bars .trend-bar-wrap {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border-bottom: 1px solid #cbd5e1;
+  box-sizing: border-box;
+}
+
+.tf-summary-bars .trend-bar {
+  width: 30px !important;
+  max-width: 30px !important;
+  min-height: 3px;
+  border-radius: 5px 5px 0 0;
+}
+
+.tf-summary-bars .trend-day {
+  height: 22px;
+  flex-shrink: 0;
+  padding-top: 4px;
+  font-size: 9px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  white-space: nowrap;
+}

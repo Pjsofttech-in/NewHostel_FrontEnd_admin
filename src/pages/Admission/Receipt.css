@@ -1,0 +1,396 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+/* =========================================
+   ADMISSION RECEIPT
+========================================= */
+
+.rc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2px 4px;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 100;
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+}
+
+.rc-modal {
+  width: 620px;
+  max-width: 100%;
+}
+
+.rc-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.rc-toolbar-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.rc-print-btn {
+  height: 22px;
+  padding: 0 10px;
+  background: #2563eb;
+  color: #fff;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rc-print-btn:hover {
+  background: #1d4ed8;
+}
+
+.rc-close-btn {
+  height: 22px;
+  padding: 0 10px;
+  background: #fff;
+  color: #475569;
+  border: 1px solid #dce2ea;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rc-close-btn:hover {
+  background: #f1f5f9;
+}
+
+.rc-paper {
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+  color: #172033;
+  line-height: 1.3;
+  max-height: calc(100vh - 30px);
+  overflow: hidden;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.rc-head {
+  text-align: center;
+  border-bottom: 2px solid #172033;
+  padding-bottom: 3px;
+}
+
+.rc-head h1 {
+  margin: 0 0 1px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.2px;
+  color: #111827;
+  text-transform: uppercase;
+}
+
+.rc-head p {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #64748b;
+}
+
+.rc-head .rc-building-address {
+  margin-top: 3px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #64748b;
+}
+
+.rc-head .rc-contact {
+  margin-top: 2px;
+  font-size: 8.5px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #64748b;
+}
+
+.rc-title-band {
+  margin: 4px 0 0;
+  padding: 2px;
+  background: #2563eb;
+  color: #fff;
+  text-align: center;
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  border-radius: 4px;
+}
+
+.rc-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 3px 2px;
+  border-bottom: 1px dashed #dce2ea;
+  font-size: 8.5px;
+  color: #334155;
+}
+
+.rc-meta b {
+  font-weight: 700;
+  color: #111827;
+}
+
+.rc-chip {
+  padding: 1px 6px;
+  border-radius: 15px;
+  font-size: 7.5px;
+  font-weight: 700;
+  background: #eff6ff;
+  color: #2563eb;
+  text-transform: uppercase;
+}
+
+.rc-chip.paid {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.rc-chip.partial {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.rc-chip.pending {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* =========================================
+   SECTIONS
+========================================= */
+
+.rc-section {
+  margin: 4px 0 1px;
+  padding: 1px 5px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #2563eb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e7ebf2;
+}
+
+/* =========================================
+   TABLES
+========================================= */
+
+.rc-table,
+.rc-fee,
+.rc-hist {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rc-table td {
+  padding: 1px 4px;
+  font-size: 8.5px;
+  color: #64748b;
+  border-bottom: 1px solid #f1f5f9;
+  width: 22%;
+}
+
+.rc-table .rc-val {
+  color: #1e293b;
+  font-weight: 600;
+  width: 28%;
+  word-break: break-word;
+}
+
+/* =========================================
+   FEE TABLE
+========================================= */
+
+.rc-fee td {
+  padding: 1px 5px;
+  font-size: 8.5px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.rc-fee .rc-num {
+  text-align: right;
+  font-weight: 600;
+  color: #1e293b;
+  white-space: nowrap;
+}
+
+.rc-row-grand td {
+  background: #f8fafc;
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #111827;
+  border-top: 1px solid #dce2ea;
+  border-bottom: 1px solid #dce2ea;
+}
+
+.rc-paid {
+  color: #15803d !important;
+}
+
+.rc-red {
+  color: #dc2626 !important;
+  font-weight: 700 !important;
+}
+
+.rc-green {
+  color: #15803d !important;
+  font-weight: 700 !important;
+}
+
+/* =========================================
+   PAYMENT HISTORY
+========================================= */
+
+.rc-hist th {
+  padding: 1px 5px;
+  font-size: 8px;
+  font-weight: 700;
+  color: #64748b;
+  text-align: left;
+  border-bottom: 1px solid #e7ebf2;
+  text-transform: uppercase;
+}
+
+.rc-hist td {
+  padding: 1px 5px;
+  font-size: 8.5px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.rc-hist .rc-num {
+  text-align: right;
+  font-weight: 600;
+}
+
+.rc-hist-total td {
+  background: #f8fafc;
+  font-weight: 700;
+  color: #111827;
+  border-bottom: 0;
+}
+
+/* =========================================
+   SIGNATURES
+========================================= */
+
+.rc-sign {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.rc-sign-box {
+  flex: 1;
+  text-align: center;
+  border-top: 1px solid #94a3b8;
+  padding-top: 2px;
+  font-size: 8px;
+  color: #64748b;
+}
+
+.rc-foot {
+  margin: 4px 0 0;
+  padding-top: 3px;
+  border-top: 1px dashed #dce2ea;
+  text-align: center;
+  font-size: 7px;
+  color: #94a3b8;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 640px) {
+  .rc-overlay {
+    padding: 2px 4px;
+  }
+
+  .rc-paper {
+    padding: 6px 8px;
+  }
+
+  .rc-table td {
+    width: 35%;
+  }
+
+  .rc-sign {
+    margin-top: 8px;
+  }
+
+  .rc-head h1 {
+    font-size: 14px;
+  }
+
+  .rc-head p {
+    font-size: 8.5px;
+  }
+
+  .rc-head .rc-building-address {
+    font-size: 9px;
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .receipt-print,
+  .receipt-print * {
+    visibility: visible;
+  }
+
+  .receipt-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    box-shadow: none;
+    border-radius: 0;
+    padding: 10px 6px;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .rc-title-band {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    margin: 12mm;
+  }
+}

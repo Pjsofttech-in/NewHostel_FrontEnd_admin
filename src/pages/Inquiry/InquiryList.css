@@ -1,0 +1,881 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap");
+
+/* =========================================
+   INQUIRY LIST — FINAL
+   - Columns: ID, Date, Name, Mobile, Email,
+     City, State, Room, Bed, Status, Source
+   - Horizontal scroll NAHI (compact)
+   - Filter bar: Search + Total + All Status
+   - Footer: Showing info + Per Page (khali)
+========================================= */
+
+.inquiry-list-page {
+  width: 100%;
+  min-height: 100%;
+  padding: 8px 10px;
+  box-sizing: border-box;
+  font-family: "Poppins", "Segoe UI", system-ui, sans-serif;
+  color: #172033;
+}
+
+.inquiry-list-page input,
+.inquiry-list-page select,
+.inquiry-list-page button {
+  font-family: inherit;
+}
+
+/* ================= FILTER CARD ================= */
+
+.inquiry-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid #e7ebf2;
+  border-radius: 8px;
+  padding: 4px 8px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+.inquiry-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 250px;
+  height: 24px;
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.inquiry-search > svg {
+  margin-left: 9px;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.inquiry-search input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0 26px 0 7px;
+  font-size: 10px;
+  font-family: inherit;
+  color: #334155;
+}
+
+.inquiry-search input::placeholder {
+  color: #94a3b8;
+}
+
+.search-clear {
+  position: absolute;
+  right: 7px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.search-clear:hover {
+  color: #ef4444;
+}
+
+.filter-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ================= TOTAL CHIP (filter bar madhe) ================= */
+
+.filter-total {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px;
+  background: #fff;
+  border: 1px solid #dce2ea;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+.filter-total span {
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.filter-total strong {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+/* ================= STATUS FILTER ================= */
+
+.status-filter {
+  height: 24px;
+  min-width: 96px;
+  padding: 0 6px;
+  border: 1px solid #dce2ea;
+  border-radius: 6px;
+  background: #fff;
+  color: #334155;
+  font-size: 10px;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.status-filter:focus {
+  border-color: #2563eb;
+}
+
+/* ================= PER PAGE (FOOTER madhe — khali) ================= */
+
+.per-page {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.per-page select {
+  height: 24px;
+  padding: 0 8px;
+  border: 1px solid #dce2ea;
+  border-radius: 6px;
+  background: #fff;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+}
+
+.per-page select:hover {
+  border-color: #2563eb;
+}
+
+/* ================= TABLE CARD ================= */
+
+.inquiry-table-card {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e7ebf2;
+  border-radius: 9px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* HORIZONTAL SCROLL NAHI */
+
+.inquiry-table-wrap {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.inquiry-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* BLUE HEADER */
+.inquiry-table thead {
+  background: #2563eb;
+}
+
+.inquiry-table th {
+  padding: 5px 4px;
+  color: #fff;
+  text-align: left;
+  font-size: 8.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inquiry-table td {
+  padding: 4px 4px;
+  border-bottom: 1px solid #edf0f4;
+  color: #475569;
+  font-size: 8.5px;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inquiry-table tbody tr:nth-child(even) {
+  background: #f8fafc;
+}
+
+.inquiry-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.inquiry-table tbody tr:hover {
+  background: #f1f5f9;
+}
+
+.inquiry-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ================= COLUMN WIDTHS (11 columns — compact) ================= */
+
+.inquiry-table th:nth-child(1),
+.inquiry-table td:nth-child(1) {
+  width: 68px;
+} /* ID */
+
+.inquiry-table th:nth-child(2),
+.inquiry-table td:nth-child(2) {
+  width: 72px;
+} /* Date */
+
+.inquiry-table th:nth-child(3),
+.inquiry-table td:nth-child(3) {
+  width: auto;
+} /* Name (flexible) */
+
+.inquiry-table th:nth-child(4),
+.inquiry-table td:nth-child(4) {
+  width: 78px;
+} /* Mobile */
+
+.inquiry-table th:nth-child(5),
+.inquiry-table td:nth-child(5) {
+  width: 16%;
+} /* Email */
+
+.inquiry-table th:nth-child(6),
+.inquiry-table td:nth-child(6) {
+  width: 64px;
+} /* City */
+
+.inquiry-table th:nth-child(7),
+.inquiry-table td:nth-child(7) {
+  width: 74px;
+} /* State */
+
+.inquiry-table th:nth-child(8),
+.inquiry-table td:nth-child(8) {
+  width: 54px;
+} /* Room */
+
+.inquiry-table th:nth-child(9),
+.inquiry-table td:nth-child(9) {
+  width: 52px;
+} /* Bed */
+
+.inquiry-table th:nth-child(10),
+.inquiry-table td:nth-child(10) {
+  width: 92px;
+} /* Status */
+
+.inquiry-table th:nth-child(11),
+.inquiry-table td:nth-child(11) {
+  width: 62px;
+} /* Source */
+
+/* ================= INQUIRY NO PILL ================= */
+
+.inquiry-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #2563eb;
+  font-size: 8px;
+  font-weight: 700;
+}
+
+/* ================= NAME ================= */
+
+.table-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 8.5px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+/* ================= TEXT ================= */
+
+.table-text {
+  font-size: 8.5px;
+  color: #475569;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+.table-date {
+  font-size: 8px;
+  color: #64748b;
+}
+
+/* ================= STATUS PILLS (rounded) ================= */
+
+.inquiry-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 2px 5px;
+  border: none;
+  border-radius: 15px;
+  font-size: 7.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.status-new {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.status-interested {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-callback {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-not-interested {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.status-dnd {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.status-ringing-waiting {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.status-joined {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-clickable {
+  cursor: pointer;
+}
+
+.status-final {
+  cursor: default;
+}
+
+.status-edit-icon {
+  font-size: 8px;
+  opacity: 0.7;
+}
+
+/* ================= STATUS EDIT (vertical — 92px column madhe fit) ================= */
+
+.status-edit-box {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 3px;
+  width: 100%;
+}
+
+.status-edit-box select {
+  width: 100%;
+  height: 22px;
+  min-width: 0;
+  padding: 0 3px;
+  border: 1px solid #dce2ea;
+  border-radius: 5px;
+  background: #fff;
+  color: #334155;
+  font-size: 8.5px;
+  font-family: inherit;
+  outline: none;
+}
+
+.status-edit-actions {
+  display: flex;
+  gap: 3px;
+}
+
+.status-edit-actions button {
+  flex: 1;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 8.5px;
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.status-save-btn {
+  background: #16a34a;
+  color: #fff;
+}
+
+.status-save-btn:hover {
+  background: #15803d;
+}
+
+.status-cancel-btn {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.status-cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-list {
+  text-align: center !important;
+  padding: 30px 15px !important;
+  color: #94a3b8 !important;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+
+/* ================= FOOTER (showing info + per page — khali) ================= */
+
+.inquiry-list-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 7px;
+  padding: 0 2px;
+  font-size: 10px;
+  color: #64748b;
+}
+
+.inquiry-list-footer strong {
+  color: #334155;
+}
+
+.inquiry-list-footer .footer-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.inquiry-list-footer .joined-info {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+/* ================= PAGINATION ================= */
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.page-btn {
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dce2ea;
+  border-radius: 5px;
+  background: #fff;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.page-btn.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  cursor: default;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.page-nav {
+  padding: 0 8px;
+}
+
+.page-ellipsis {
+  padding: 0 3px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 800px) {
+  .inquiry-list-page {
+    padding: 8px;
+  }
+
+  .inquiry-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inquiry-search {
+    width: 100%;
+  }
+
+  .filter-right {
+    width: 100%;
+  }
+
+  .filter-right .status-filter {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .inquiry-list-footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .inquiry-list-footer .footer-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* ================= NAME CLICKABLE ================= */
+
+.table-name-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: 8.5px;
+  font-weight: 600;
+  color: #2563eb;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.table-name-btn:hover {
+  color: #1d4ed8;
+}
+
+/* ================= DETAILS MODAL (view / edit / delete) ================= */
+
+.id-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  box-sizing: border-box;
+  z-index: 80;
+}
+
+.id-modal {
+  width: 620px;
+  max-width: 96vw;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 9px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  font-family: inherit;
+}
+
+.id-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #2563eb;
+  border-radius: 9px 9px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.id-title {
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.id-close {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.id-close:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.id-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 8px;
+}
+
+.id-section {
+  border: 1px solid #e7ebf2;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
+
+/* Additional Information — khali ani CHOTA box */
+
+.id-body > .id-section + .id-section {
+  width: 72%;
+  max-width: 430px;
+}
+
+.id-sec-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #2563eb;
+  margin-bottom: 4px;
+}
+
+.id-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 6px;
+}
+
+.id-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 2px 0;
+  border-bottom: 1px dashed #eef2f7;
+}
+
+.id-field.span2 {
+  grid-column: 1 / -1;
+}
+
+.id-grid .id-field:last-child {
+  border-bottom: none;
+}
+
+.id-lab {
+  flex: 0 0 92px;
+  font-size: 8.5px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+.id-val {
+  flex: 1;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: #1e293b;
+  word-break: break-word;
+  text-align: right;
+}
+
+.id-input {
+  width: 100%;
+  height: 26px;
+  box-sizing: border-box;
+  border: 1px solid #dce2ea;
+  border-radius: 5px;
+  padding: 0 7px;
+  font-size: 10px;
+  font-family: inherit;
+  color: #334155;
+  background: #fff;
+  outline: none;
+}
+
+.id-input:focus {
+  border-color: #2563eb;
+}
+
+.id-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 5px 10px 7px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.id-edit-btn,
+.id-del-btn,
+.id-save-btn,
+.id-cancel-btn {
+  height: 28px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 6px;
+  font-size: 10.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.id-edit-btn {
+  background: #2563eb;
+  color: #fff;
+}
+
+.id-edit-btn:hover {
+  background: #1d4ed8;
+}
+
+.id-del-btn {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.id-del-btn:hover {
+  background: #fecaca;
+}
+
+.id-save-btn {
+  background: #16a34a;
+  color: #fff;
+}
+
+.id-save-btn:hover {
+  background: #15803d;
+}
+
+.id-cancel-btn {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.id-cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+@media (max-width: 800px) {
+  .id-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================= EDIT MODE (purn InquiryForm modal madhe) ================= */
+
+.id-edit-form {
+  grid-column: 1 / -1;
+}
+
+.id-edit-form .iq {
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* ================= DOWNLOAD PILLS ================= */
+
+.download-pill {
+  height: 24px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.download-pill.pdf {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.download-pill.pdf:hover {
+  background: #fecaca;
+}
+
+.download-pill.csv {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.download-pill.csv:hover {
+  background: #bbf7d0;
+}
