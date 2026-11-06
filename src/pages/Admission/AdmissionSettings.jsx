@@ -314,7 +314,7 @@ const AdmissionSettings = () => {
         )}
 
         {/* ========== SOURCES ========== */}
-        {section === "sources" && (
+        {/* {section === "sources" && (
           <div className="as-leave">
             <div className="as-top">
               <button type="button" className="as-add-btn" onClick={() => { setOpenSource(true); setEditSource(null); setSourceForm({ source: "" }); }}>
@@ -335,46 +335,82 @@ const AdmissionSettings = () => {
               ))}
             </div>
           </div>
-        )}
+        )} */}
 
         {/* ========== LEAVE (local) ========== */}
-        {section === "leave" && (
+        {/* ========== SOURCES ========== */}
+        {section === "sources" && (
           <div className="as-leave">
             <div className="as-top">
-              <button type="button" className="as-add-btn" onClick={() => setOpenLeave(true)}>Add Leave</button>
+              <button
+                type="button"
+                className="as-add-btn"
+                onClick={() => {
+                  setOpenSource(true);
+                  setEditSource(null);
+                  setSourceForm({ source: "" });
+                }}
+              >
+                Add Source
+              </button>
             </div>
-            <div className="as-leave-bar">
-              <label className="as-leave-field"><span>Status</span>
-                <select value={leaveFilter.status} onChange={(e) => setLeaveFilter({ ...leaveFilter, status: e.target.value })}>
-                  <option>All</option><option>Pending</option><option>Approved</option><option>Rejected</option>
-                </select>
-              </label>
-              <label className="as-leave-field"><span>Start</span><input type="date" value={leaveFilter.start} onChange={(e) => setLeaveFilter({ ...leaveFilter, start: e.target.value })} /></label>
-              <label className="as-leave-field"><span>End</span><input type="date" value={leaveFilter.end} onChange={(e) => setLeaveFilter({ ...leaveFilter, end: e.target.value })} /></label>
-            </div>
-            <div className="as-leave-table-wrap">
-              <table className="as-leave-table">
-                <thead><tr><th>User ID</th><th>Name</th><th>From</th><th>To</th><th>Reason</th><th>Status</th><th>Action</th></tr></thead>
+
+            <div className="as-source-table-wrap">
+              <table className="as-source-table">
+                <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Source Name</th>
+                    <th style={{ width: "120px" }}>Actions</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  {shownLeaves.length === 0 ? (
-                    <tr><td colSpan={7} className="as-leave-empty">No records found.</td></tr>
-                  ) : shownLeaves.map((l) => (
-                    <tr key={l.id}>
-                      <td>{l.userId}</td><td>{l.name}</td><td>{l.from}</td><td>{l.to}</td><td>{l.reason || "—"}</td>
-                      <td><span className={`as-badge ${l.status.toLowerCase()}`}>{l.status}</span></td>
-                      <td>
-                        <div className="as-leave-acts">
-                          {l.status === "Pending" && (
-                            <>
-                              <button type="button" className="as-act ok" onClick={() => setLeaves((prev) => prev.map((x) => x.id === l.id ? { ...x, status: "Approved" } : x))}>Approve</button>
-                              <button type="button" className="as-act no" onClick={() => setLeaves((prev) => prev.map((x) => x.id === l.id ? { ...x, status: "Rejected" } : x))}>Reject</button>
-                            </>
-                          )}
-                          <button type="button" className="as-act del" onClick={() => setLeaves((prev) => prev.filter((x) => x.id !== l.id))}>Delete</button>
-                        </div>
+                  {sources.length === 0 ? (
+                    <tr >
+                      <td colSpan={2} className="as-leave-empty">
+                        No sources added yet.
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    sources.map((s) => (
+                      <tr key={s.id} onClick={() => {
+                                setEditSource(s);
+                                setSourceForm({ source: s.source });
+                                setOpenSource(true);
+                              }}>
+                        <td>
+                          <span>
+                            {s.id}
+                          </span>
+                        </td>
+                        <td>
+                          <span className="as-source-name">{s.source}</span>
+                        </td>
+                        <td>
+                          <div className="as-source-actions">
+                            {/* <button
+                              type="button"
+                              className="as-ico-btn edit"
+                              onClick={() => {
+                                setEditSource(s);
+                                setSourceForm({ source: s.source });
+                                setOpenSource(true);
+                              }}
+                            >
+                              <FaPen />
+                            </button> */}
+                            <button
+                              type="button"
+                              className="as-ico-btn del"
+                              onClick={() => handleDeleteSource(s)}
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -382,7 +418,7 @@ const AdmissionSettings = () => {
         )}
 
         {/* ========== BANK (local) ========== */}
-        {/* {section === "bank" && (
+        {section === "bank" && (
           <div className="as-leave">
             <div className="as-top">
               <button type="button" className="as-add-btn" onClick={() => { setEditBank(null); setBankForm(emptyBank); setBankError(""); setOpenBank(true); }}>Add Bank</button>
@@ -402,10 +438,10 @@ const AdmissionSettings = () => {
                 ))}
             </div>
           </div>
-        )} */}
+        )}
 
         {/* ========== RULES (local) ========== */}
-        {/* {section === "rules" && (
+        {section === "rules" && (
           <div className="as-leave">
             <div className="as-top as-rule-top">
               <input className="as-input as-rule-input" type="text" placeholder="Type hostel rule here..." value={ruleText} onChange={(e) => setRuleText(e.target.value)} />
@@ -422,7 +458,7 @@ const AdmissionSettings = () => {
                 ))}
             </div>
           </div>
-        )} */}
+        )}
       </section>
 
       {/* ====== FLOOR MODAL ====== */}

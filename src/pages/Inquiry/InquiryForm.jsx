@@ -9,8 +9,35 @@ const todayStr = () => {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 };
 
-const MH_DISTRICTS = ["Pune","Mumbai","Nagpur","Nashik","Aurangabad","Kolhapur","Satara","Solapur","Ahmednagar","Other"];
-
+const STATE_DISTRICTS = {
+  Maharashtra: [
+    "Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara",
+    "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli",
+    "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban",
+    "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar",
+    "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara",
+    "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"
+  ],
+  Gujarat: [
+    "Ahmedabad", "Amreli", "Anand", "Aravalli", "Banaskantha", "Bharuch",
+    "Bhavnagar", "Botad", "Chhota Udaipur", "Dahod", "Dang", "Devbhoomi Dwarka",
+    "Gandhinagar", "Gir Somnath", "Jamnagar", "Junagadh", "Kheda", "Kutch",
+    "Mahisagar", "Mehsana", "Morbi", "Narmada", "Navsari", "Panchmahal",
+    "Patan", "Porbandar", "Rajkot", "Sabarkantha", "Surat", "Surendranagar",
+    "Tapi", "Vadodara", "Valsad"
+  ],
+  Karnataka: [
+    "Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban",
+    "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga",
+    "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri",
+    "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur",
+    "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"
+  ],
+  // Add more states as needed...
+  Delhi: ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
+  // Default for other states
+  Other: ["Other"]
+};
 const Field = ({ label, required, children }) => (
   <div className="iq-field">
     <span className="iq-label">
@@ -53,20 +80,20 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-  getAllSources()
-    .then((data) => {
-      if (Array.isArray(data)) {
-        setSources(
-          data
-            .map((s) => s.source || s.sourceName || "")
-            .filter(Boolean)
-        );
-      }
-    })
-    .catch(() => {
-      setSources(["Walk-in", "Online", "Referral", "Other"]);
-    });
-}, []);
+    getAllSources()
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setSources(
+            data
+              .map((s) => s.source || s.sourceName || "")
+              .filter(Boolean)
+          );
+        }
+      })
+      .catch(() => {
+        setSources(["Walk-in", "Online", "Referral", "Other"]);
+      });
+  }, []);
 
   const set = (e) => {
     const { name, value } = e.target;
@@ -133,19 +160,53 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
         <Field label="State">
           <select name="state" value={form.state} onChange={set}>
             <option value="">Select State</option>
-            <option>Maharashtra</option>
+            <option>Andhra Pradesh</option>
+            <option>Arunachal Pradesh</option>
+            <option>Assam</option>
+            <option>Bihar</option>
+            <option>Chhattisgarh</option>
+            <option>Goa</option>
             <option>Gujarat</option>
+            <option>Haryana</option>
+            <option>Himachal Pradesh</option>
+            <option>Jharkhand</option>
             <option>Karnataka</option>
+            <option>Kerala</option>
+            <option>Madhya Pradesh</option>
+            <option>Maharashtra</option>
+            <option>Manipur</option>
+            <option>Meghalaya</option>
+            <option>Mizoram</option>
+            <option>Nagaland</option>
+            <option>Odisha</option>
+            <option>Punjab</option>
+            <option>Rajasthan</option>
+            <option>Sikkim</option>
+            <option>Tamil Nadu</option>
+            <option>Telangana</option>
+            <option>Tripura</option>
+            <option>Uttar Pradesh</option>
+            <option>Uttarakhand</option>
+            <option>West Bengal</option>
+            {/* Union Territories */}
+            <option>Andaman and Nicobar Islands</option>
+            <option>Chandigarh</option>
+            <option>Dadra and Nagar Haveli and Daman and Diu</option>
             <option>Delhi</option>
-            <option>Other</option>
+            <option>Jammu and Kashmir</option>
+            <option>Ladakh</option>
+            <option>Lakshadweep</option>
+            <option>Puducherry</option>
           </select>
         </Field>
 
         <Field label="District">
           <select name="district" value={form.district} onChange={set}>
             <option value="">Select District</option>
-            {(form.state === "Maharashtra" ? MH_DISTRICTS : ["Other"]).map((d) => (
-              <option key={d} value={d}>{d}</option>
+            {(STATE_DISTRICTS[form.state] || STATE_DISTRICTS["Other"]).map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
             ))}
           </select>
         </Field>
@@ -164,7 +225,7 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
 
         <div className="iq-gender">
           <b>Gender :</b>
-          {["Male","Female","Other"].map((g) => (
+          {["Male", "Female", "Other"].map((g) => (
             <label key={g}>
               <input type="radio" name="gender" value={g} checked={form.gender === g} onChange={set} />
               {g}
@@ -209,7 +270,7 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
             <option value="">Select Source</option>
             {sources.length
               ? sources.map((s) => <option key={s} value={s}>{s}</option>)
-              : ["Walk-in","Online","Referral","Other"].map((s) => <option key={s}>{s}</option>)
+              : ["Walk-in", "Online", "Referral", "Other"].map((s) => <option key={s}>{s}</option>)
             }
           </select>
         </Field>
