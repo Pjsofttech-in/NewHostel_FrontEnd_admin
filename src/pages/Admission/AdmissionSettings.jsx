@@ -75,8 +75,25 @@ const AdmissionSettings = () => {
 
   // ---- Load rooms for selected floor ----
   const loadRooms = useCallback(async (floorId) => {
-    try { setRooms(await getRoomsByFloor(floorId)); setBeds([]); }
-    catch (err) { console.error(err); }
+    try {
+      const roomsData = await getRoomsByFloor(floorId);
+
+      // Load beds for each room
+      const roomsWithBeds = await Promise.all(
+        roomsData.map(async (room) => {
+          try {
+            const beds = await getBedsByRoom(room.id);
+            return { ...room, beds: beds || [] };
+          } catch {
+            return { ...room, beds: [] };
+          }
+        })
+      );
+
+      setRooms(roomsWithBeds);
+    } catch (err) {
+      console.error(err);
+    }
   }, []);
 
   // ---- Load beds for a room ----
@@ -156,15 +173,19 @@ const AdmissionSettings = () => {
   const saveBed = async (e) => {
     e.preventDefault();
     try {
-      const payload = { ...bedForm, room: { id: bedRoomId } };
       if (editBed) {
-        await updateBed(editBed.id, payload);
+        await updateBed(editBed.id, bedForm);
       } else {
-        await createBed(payload);
+        // Pass roomId as second argument
+        await createBed(bedForm, bedRoomId);
       }
       await loadRooms(selectedFloor.id);
-      setOpenBed(false); setEditBed(null); setBedRoomId(null);
-    } catch (err) { alert("Failed: " + err.message); }
+      setOpenBed(false);
+      setEditBed(null);
+      setBedRoomId(null);
+    } catch (err) {
+      alert("Failed: " + err.message);
+    }
   };
 
   const handleDeleteBed = async (bed) => {
@@ -295,12 +316,65 @@ const AdmissionSettings = () => {
                 {rooms.map((r) => (
                   <div key={r.id} className={r.roomType === "AC" ? "as-room ac" : "as-room nonac"}>
                     <div className="as-room-actions">
-                      <button type="button" className="as-ico-btn edit" onClick={() => { setEditRoom(r); setRoomForm({ roomNumber: r.roomNumber, roomType: r.roomType, totalBeds: r.totalBeds }); setOpenRoom(true); }}><FaPen /></button>
-                      <button type="button" className="as-ico-btn del" onClick={() => handleDeleteRoom(r)}><FaTrashAlt /></button>
+                      <button
+                        type="button"
+                        className="as-ico-btn edit"
+                        onClick={() => {
+                          setEditRoom(r);
+                          setRoomForm({
+                            roomNumber: r.roomNumber,
+                            roomType: r.roomType,
+                            totalBeds: r.totalBeds,
+                          });
+                          setOpenRoom(true);
+                        }}
+                      >
+                        <FaPen />
+                      </button>
+                      <button
+                        type="button"
+                        className="as-ico-btn del"
+                        onClick={() => handleDeleteRoom(r)}
+                      >
+                        <FaTrashAlt />
+                      </button>
                     </div>
+
                     <div className="as-room-name">{r.roomNumber}</div>
-                    <div className="as-room-cap">Capacity: {r.totalBeds} beds — {r.roomType}</div>
-                    <button type="button" className="as-plus" onClick={() => openAddBed(r.id)}>+ Add Bed</button>
+                    <div className="as-room-cap">
+                      Capacity: {r.totalBeds} beds — {r.roomType}
+                    </div>
+
+                    {/* ===== Beds List ===== */}
+                    <div className="as-beds-list">
+                      {r.beds && r.beds.length > 0 ? (
+                        r.beds.map((bed) => (
+                          <div key={bed.id} className="as-bed-item">
+                            <span className="as-bed-number">
+                              {bed.bedType === "Double" ? <MdKingBed /> : <FaBed />}{" "}
+                              {bed.bedNumber}
+                            </span>
+                            <span className={`as-bed-status ${bed.status?.toLowerCase()}`}>
+                              {bed.status || "AVAILABLE"}
+                            </span>
+                            <button
+                              type="button"
+                              className="as-ico-btn del"
+                              onClick={() => handleDeleteBed(bed)}
+                              title="Delete Bed"
+                            >
+                              <FaTrashAlt />
+                            </button>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="as-no-beds">No beds added</div>
+                      )}
+                    </div>
+
+                    <button type="button" className="as-plus" onClick={() => openAddBed(r.id)}>
+                      + Add Bed
+                    </button>
                   </div>
                 ))}
               </div>
@@ -374,10 +448,10 @@ const AdmissionSettings = () => {
                   ) : (
                     sources.map((s) => (
                       <tr key={s.id} onClick={() => {
-                                setEditSource(s);
-                                setSourceForm({ source: s.source });
-                                setOpenSource(true);
-                              }}>
+                        setEditSource(s);
+                        setSourceForm({ source: s.source });
+                        setOpenSource(true);
+                      }}>
                         <td>
                           <span>
                             {s.id}

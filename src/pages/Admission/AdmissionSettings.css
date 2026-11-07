@@ -241,14 +241,17 @@
   background: #eff6ff;
   color: #1d4ed8;
 }
+
 .as-stat.ok {
   background: #ecfdf5;
   color: #047857;
 }
+
 .as-stat.no {
   background: #fef2f2;
   color: #b91c1c;
 }
+
 .as-stat.wait {
   background: #fffbeb;
   color: #b45309;
@@ -306,10 +309,12 @@
   background: #fef3c7;
   color: #b45309;
 }
+
 .as-badge.approved {
   background: #d1fae5;
   color: #047857;
 }
+
 .as-badge.rejected {
   background: #fee2e2;
   color: #b91c1c;
@@ -334,10 +339,12 @@
   background: #d1fae5;
   color: #047857;
 }
+
 .as-act.no {
   background: #fee2e2;
   color: #b91c1c;
 }
+
 .as-act.del {
   background: #f1f5f9;
   color: #475569;
@@ -468,6 +475,7 @@
 .as-ico-btn.edit {
   color: #2563eb;
 }
+
 .as-ico-btn.del {
   color: #ef4444;
 }
@@ -521,6 +529,7 @@
   width: 24px;
   height: 24px;
 }
+
 .as-bed-dbl {
   width: 30px;
   height: 30px;
@@ -529,6 +538,7 @@
 .as-bed.left {
   color: #22c55e;
 }
+
 .as-bed.alloc {
   color: #ef4444;
 }
@@ -549,9 +559,11 @@
   width: 16px;
   height: 16px;
 }
+
 .as-leg-bed.alloc {
   color: #ef4444;
 }
+
 .as-leg-bed.left {
   color: #22c55e;
 }
@@ -596,12 +608,15 @@
 .lg.ac {
   background: #c8efd0;
 }
+
 .lg.nonac {
   background: #f8cdd8;
 }
+
 .lg.alloc {
   background: #ef4444;
 }
+
 .lg.left {
   background: #22c55e;
 }
@@ -629,9 +644,11 @@
 .as-leg-bed.occupied {
   color: #ef4444;
 }
+
 .as-leg-bed.occupied svg {
   color: #ef4444;
 }
+
 .as-bank-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -733,6 +750,7 @@
     grid-template-columns: 1fr;
   }
 }
+
 .as-modal.as-modal-sm {
   width: 480px !important;
   max-width: 92vw !important;
@@ -776,6 +794,7 @@
     grid-template-columns: 1fr;
   }
 }
+
 .as-rule-top {
   justify-content: flex-end;
 }
@@ -994,4 +1013,56 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.as-beds-list {
+  margin: 10px 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.as-bed-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+.as-bed-number {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
+}
+
+.as-bed-status {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.as-bed-status.available {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.as-bed-status.occupied {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.as-bed-status.maintenance {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.as-no-beds {
+  font-size: 11px;
+  color: #64748b;
+  font-style: italic;
 }

@@ -10,7 +10,7 @@ export const createBed = async (bed, role, email, roomId) => {
 
 export const getBedsByRoom = async (roomId, role, email) => {
   const res = await axiosInstance.get(
-    `/getBedsByRoom/${roomId}?role=${role}&email=${email}`
+    `/getBedsByRoom?roomId=${roomId}&role=${role}&email=${email}`
   );
   return res.data;
 };

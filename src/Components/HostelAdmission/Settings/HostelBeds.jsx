@@ -72,11 +72,13 @@ const HostelBed = ({ room, onBack }) => {
         AlertService.warn("Please enter bed number");
         return;
       }
+      console.log("Room object →", room);
+    console.log("Room ID →", room?.id);
       if (editingBed) {
         await updateBed(editingBed.id, formData, role, email);
         AlertService.success("Bed updated successfully");
       } else {
-        await createBed(formData, role, email, room.id);
+        await createBed(formData, role, email, room.roomId);
         AlertService.success("Bed added successfully");
       }
       setDialogOpen(false);

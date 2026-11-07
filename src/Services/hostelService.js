@@ -51,8 +51,8 @@ export async function deleteRoom(id) {
 
 /* ================== BED ================== */
 
-export async function createBed(bedData) {
-  return api.post("/createBed", bedData);
+export async function createBed(bedData, roomId) {
+  return api.post("/createBed", bedData, { roomId });   // ← roomId added
 }
 
 export async function updateBed(id, bedData) {
@@ -74,6 +74,7 @@ export async function getBedsByRoom(roomId) {
 export async function deleteBed(id) {
   return api.delete(`/deleteBedById/${id}`);
 }
+
 
 /* ================== SOURCE ================== */
 
