@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { FaBed, FaCalendarAlt, FaGavel, FaPen, FaTrashAlt, FaUniversity } from "react-icons/fa";
+// import { FaBed, FaCalendarAlt, FaGavel, FaPen, FaTrashAlt, FaUniversity } from "react-icons/fa";
 import { MdKingBed } from "react-icons/md";
 import "./AdmissionSettings.css";
 import {
@@ -8,6 +8,12 @@ import {
   getRoomsByFloor, createRoom, updateRoom, deleteRoom as apiDeleteRoom,
   getAllBeds, createBed, updateBed, deleteBed as apiDeleteBed, getBedsByRoom,
 } from "../../services/hostelService.js";
+import {
+  FaBed, FaCalendarAlt, FaGavel, FaPen, FaTrashAlt, FaUniversity,
+  FaWhatsapp, FaYoutube, FaTelegram, FaReddit, FaInstagram,
+  FaFacebook, FaTwitter, FaLinkedin, FaBullhorn, FaNewspaper,
+  FaBookOpen, FaWalking
+} from "react-icons/fa";
 
 const LEAVE_KEY = "hostel-admission-leaves";
 const BANKS_KEY = "hostel-banks";
@@ -264,7 +270,7 @@ const AdmissionSettings = () => {
         {[
           { id: "rooms", icon: <FaBed />, label: "Rooms" },
           { id: "sources", icon: <FaGavel />, label: "Sources" },
-          { id: "leave", icon: <FaCalendarAlt />, label: "Leave" },
+          // { id: "leave", icon: <FaCalendarAlt />, label: "Leave" },
           { id: "bank", icon: <FaUniversity />, label: "Bank" },
           { id: "rules", icon: <FaGavel />, label: "Rules" },
         ].map(({ id, icon, label }) => (
@@ -599,7 +605,7 @@ const AdmissionSettings = () => {
       )}
 
       {/* ====== SOURCE MODAL ====== */}
-      {openSource && (
+      {/* {openSource && (
         <div className="as-overlay" onClick={() => setOpenSource(false)}>
           <form className="as-modal as-modal-sm" onClick={(e) => e.stopPropagation()} onSubmit={saveSource}>
             <div className="as-modal-title">{editSource ? "Edit Source" : "Add Source"}</div>
@@ -612,7 +618,96 @@ const AdmissionSettings = () => {
             </div>
           </form>
         </div>
-      )}
+      )} */}
+      {/* ====== SOURCE MODAL ====== */}
+{openSource && (
+  <div className="as-overlay" onClick={() => setOpenSource(false)}>
+    <div
+      className="as-modal as-source-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="as-modal-header">
+        <h3>Select or Add Source</h3>
+      </div>
+
+      <div className="as-source-body">
+        <div className="as-popular-label">Popular Sources</div>
+
+        <div className="as-source-chips">
+          {[
+            { name: "WhatsApp", icon: <FaWhatsapp /> },
+            { name: "YouTube", icon: <FaYoutube /> },
+            { name: "Telegram", icon: <FaTelegram /> },
+            { name: "Reddit", icon: <FaReddit /> },
+            { name: "Instagram", icon: <FaInstagram /> },
+            { name: "Facebook", icon: <FaFacebook /> },
+            { name: "Twitter", icon: <FaTwitter /> },
+            { name: "LinkedIn", icon: <FaLinkedin /> },
+            { name: "Banner", icon: <FaBullhorn /> },
+            { name: "Hoarding", icon: <FaBullhorn /> },
+            { name: "Newspaper", icon: <FaNewspaper /> },
+            { name: "Pamphlet", icon: <FaBookOpen /> },
+            { name: "Direct Walk-in", icon: <FaWalking /> },
+          ].map((item) => (
+            <button
+              key={item.name}
+              type="button"
+              className="as-source-chip"
+              onClick={() => {
+                setSourceForm({ source: item.name });
+                // Auto-save when a popular source is clicked
+                setTimeout(() => {
+                  const fakeEvent = { preventDefault: () => {} };
+                  // Temporarily set form then call save
+                  createSource({ source: item.name })
+                    .then(() => {
+                      loadSources();
+                      setOpenSource(false);
+                      setEditSource(null);
+                      setSourceForm({ source: "" });
+                    })
+                    .catch((err) => alert("Failed: " + err.message));
+                }, 0);
+              }}
+            >
+              <span className="as-chip-icon">{item.icon}</span>
+              {item.name}
+            </button>
+          ))}
+        </div>
+
+        <div className="as-or-label">Or Enter Custom Source</div>
+
+        <form onSubmit={saveSource}>
+          <input
+            className="as-input as-custom-source"
+            placeholder="Source Name"
+            value={sourceForm.source}
+            onChange={(e) => setSourceForm({ source: e.target.value })}
+            autoFocus
+          />
+
+          <div className="as-modal-actions as-source-actions">
+            <button
+              type="button"
+              className="as-cancel"
+              onClick={() => {
+                setOpenSource(false);
+                setEditSource(null);
+                setSourceForm({ source: "" });
+              }}
+            >
+              Cancel
+            </button>
+            <button type="submit" className="as-save">
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+)}
 
       {/* ====== LEAVE MODAL ====== */}
       {openLeave && (

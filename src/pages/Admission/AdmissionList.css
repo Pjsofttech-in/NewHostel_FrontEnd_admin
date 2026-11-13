@@ -51,7 +51,7 @@
   flex: 1.5;
 }
 
-.al-field > label {
+.al-field>label {
   position: absolute;
   z-index: 5;
   top: 0;
@@ -61,7 +61,7 @@
   background: #fff;
   color: #7b8798;
   border-radius: 4px;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1;
   font-weight: 500;
   white-space: nowrap;
@@ -73,7 +73,7 @@
     border-radius 0.18s ease;
 }
 
-.al-field:focus-within > label {
+.al-field:focus-within>label {
   padding: 3px 9px;
   background: #42a5f5;
   color: #fff;
@@ -92,7 +92,7 @@
   color: #3f4c63;
   padding: 0 10px;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
   outline: none;
   transition:
@@ -135,7 +135,7 @@
   display: flex;
   align-items: center;
   color: #94a3b8;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .al-search-box input {
@@ -146,7 +146,7 @@
   flex: 1;
   min-width: 0;
   color: #3f4c63;
-  font-size: 11px;
+  font-size: 12px;
   background: transparent;
 }
 
@@ -163,7 +163,7 @@
   background: #fff;
   color: #667085;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -187,9 +187,9 @@
   min-height: 24px;
 }
 
-.al-top-row > strong {
+.al-top-row>strong {
   color: #1e293b;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -220,13 +220,13 @@
 }
 
 .al-pill span {
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 600;
   color: #64748b;
 }
 
 .al-pill strong {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -287,7 +287,7 @@
   align-items: center;
   justify-content: center;
   border: 1px solid transparent;
-  font-size: 8.5px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -348,7 +348,7 @@
   color: #fff;
   text-align: left;
   white-space: nowrap;
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -356,7 +356,7 @@
   padding: 4px 4px;
   color: #475569;
   border-bottom: 1px solid #edf0f4;
-  font-size: 8.5px;
+  font-size: 12px;
   vertical-align: middle;
   white-space: nowrap;
 }
@@ -386,7 +386,7 @@
   border-radius: 4px;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -397,6 +397,7 @@
 .al-name {
   color: #1e293b;
   font-weight: 600;
+  font-size: 14px;
 }
 
 .al-building {
@@ -429,7 +430,7 @@
   min-width: 45px;
   padding: 2px 6px;
   border-radius: 15px;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -469,7 +470,7 @@
   min-width: 50px;
   padding: 2px 6px;
   border-radius: 15px;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
   color: #15803d;
   background: #dcfce7;
@@ -505,7 +506,7 @@
   border-radius: 5px;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -523,7 +524,7 @@
   text-align: center !important;
   padding: 22px 12px !important;
   color: #94a3b8 !important;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
 }
 
@@ -545,7 +546,7 @@
 
 .al-page-info {
   color: #64748b;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .al-page-controls {
@@ -583,13 +584,13 @@
   background: #2563eb !important;
   color: #fff !important;
   border-radius: 5px !important;
-  font-size: 9px !important;
+  font-size: 12px !important;
   font-weight: 700;
 }
 
 .al-gap {
   color: #94a3b8;
-  font-size: 9px;
+  font-size: 12px;
 }
 
 .al-page-controls select {
@@ -599,7 +600,7 @@
   background: #fff;
   color: #475569;
   padding: 0 5px;
-  font-size: 9px;
+  font-size: 12px;
   font-family: inherit;
   outline: none;
   margin-left: 2px;
@@ -694,6 +695,7 @@
 }
 
 @media print {
+
   /* Hide filters, actions and pagination */
   .al-filter-card,
   .al-top-row,
@@ -740,7 +742,7 @@
     min-width: 0 !important;
     table-layout: auto !important;
     border-collapse: collapse !important;
-    font-size: 9px !important;
+    font-size: 12px !important;
     color: #000 !important;
   }
 
@@ -768,7 +770,7 @@
     border: 1px solid #999 !important;
     background: #fff !important;
     color: #000 !important;
-    font-size: 9px !important;
+    font-size: 12px !important;
     white-space: normal !important;
     overflow: visible !important;
   }
@@ -834,14 +836,14 @@
   padding: 8px 12px 4px;
 }
 
-.ap-info > div {
+.ap-info>div {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
   padding: 4px 0;
   border-bottom: 1px dashed #eef2f7;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .ap-info span {
@@ -869,7 +871,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: #64748b;
 }
@@ -880,7 +882,7 @@
   border: 1px solid #dce2ea;
   border-radius: 6px;
   padding: 0 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-family: inherit;
   color: #334155;
   background: #fff;
@@ -906,7 +908,7 @@
   border-radius: 6px;
   background: #f8fafc;
   color: #475569;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -919,7 +921,7 @@
   border-radius: 6px;
   background: #16a34a;
   color: #fff;
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
@@ -983,7 +985,7 @@
 
 .alv-head span {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #64748b;
   margin-top: 2px;
 }
@@ -991,7 +993,7 @@
 .alv-close {
   border: none;
   background: none;
-  font-size: 13px;
+  font-size: 12px;
   cursor: pointer;
   color: #64748b;
 }
@@ -1001,7 +1003,7 @@
 }
 
 .alv-sec {
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 700;
   color: #2563eb;
   text-transform: uppercase;
@@ -1028,14 +1030,14 @@
 }
 
 .alv-grid p span {
-  font-size: 10px;
+  font-size: 12px;
   color: #64748b;
   font-weight: 500;
   white-space: nowrap;
 }
 
 .alv-grid p b {
-  font-size: 10.5px;
+  font-size: 12px;
   color: #1e293b;
   font-weight: 600;
   text-align: right;
@@ -1057,7 +1059,7 @@
   height: 28px;
   padding: 0 14px;
   border-radius: 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -1112,7 +1114,7 @@
   border-radius: 5px;
   height: 26px;
   padding: 0 10px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -1202,7 +1204,7 @@
   height: 28px;
   padding: 0 14px;
   border-radius: 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -1229,7 +1231,7 @@
   background: #2563eb;
   color: #fff;
   text-align: left;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1238,7 +1240,7 @@
   padding: 4px 6px;
   border-bottom: 1px solid #edf0f4;
   color: #475569;
-  font-size: 10px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -1276,7 +1278,7 @@
 }
 
 .al-date-range input[type="date"] {
-  font-size: 9px;
+  font-size: 12px;
   padding: 0 4px;
 }
 
@@ -1323,6 +1325,7 @@
     overflow: visible;
   }
 }
+
 /* =========================================
    INSTALLMENT DETAILS MODAL
 ========================================= */
@@ -1405,7 +1408,7 @@
   border-radius: 5px;
   background: #2563eb;
   color: #fff;
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   font-family: inherit;
   letter-spacing: 0.2px;
@@ -1427,7 +1430,7 @@
   background: #2563eb;
   color: #fff;
   text-align: left;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
 }
@@ -1436,7 +1439,7 @@
   padding: 6px 8px;
   border-bottom: 1px solid #edf0f4;
   color: #334155;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -1451,7 +1454,7 @@
 .id-complete {
   color: #38ce3c;
   font-weight: 700;
-  font-size: 10.5px;
+  font-size: 12px;
 }
 
 .id-mark {
@@ -1461,7 +1464,7 @@
   border-radius: 5px;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 9.5px;
+  font-size: 12px;
   font-weight: 700;
   font-family: inherit;
   letter-spacing: 0.4px;
@@ -1476,7 +1479,7 @@
 .id-empty {
   text-align: center;
   color: #94a3b8;
-  font-size: 10.5px;
+  font-size: 12px;
   padding: 12px !important;
 }
 
@@ -1502,7 +1505,7 @@
   flex-direction: column;
   gap: 5px;
   color: #64748b;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -1516,7 +1519,7 @@
   background: #fff;
   color: #334155;
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px;
   outline: none;
 }
 
@@ -1546,7 +1549,7 @@
   background: transparent;
   color: #2563eb;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -1565,7 +1568,7 @@
   color: #334155;
   background: #fff;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .id-inline-actions {
@@ -1583,7 +1586,7 @@
   color: #334155;
   background: #fff;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .id-save {
@@ -1594,7 +1597,7 @@
   background: #1976d2;
   color: #fff;
   font-family: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -1607,9 +1610,11 @@
   .id-add-form {
     grid-template-columns: 1fr;
   }
+
   .id-form-actions {
     grid-column: auto;
   }
+
   .id-table th,
   .id-table td {
     padding: 6px;

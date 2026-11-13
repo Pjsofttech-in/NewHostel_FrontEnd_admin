@@ -975,3 +975,57 @@
   justify-content: center;
   white-space: nowrap;
 }
+/* ========== Month / Year selectors ========== */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.month-year-selectors {
+  display: flex;
+  gap: 8px;
+}
+
+.my-select {
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid #dce2ea;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+}
+
+.my-select:focus {
+  border-color: #2563eb;
+}
+
+/* Make day-wise bars look good (many columns) */
+.trend-bars.trend-month,
+.trend-bars.trend-day {
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.trend-bars.trend-month .trend-column,
+.trend-bars.trend-day .trend-column {
+  flex: 0 0 32px;
+  min-width: 32px;
+  max-width: 36px;
+}
+
+.trend-bars.trend-month .trend-bar,
+.trend-bars.trend-day .trend-bar {
+  width: 22px;
+  max-width: 22px;
+}
+
+.trend-bars.trend-month .trend-day,
+.trend-bars.trend-day .trend-day {
+  font-size: 10px;
+}

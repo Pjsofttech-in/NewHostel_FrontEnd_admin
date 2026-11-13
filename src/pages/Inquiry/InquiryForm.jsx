@@ -33,11 +33,10 @@ const STATE_DISTRICTS = {
     "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur",
     "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"
   ],
-  // Add more states as needed...
   Delhi: ["Central Delhi", "East Delhi", "New Delhi", "North Delhi", "North East Delhi", "North West Delhi", "Shahdara", "South Delhi", "South East Delhi", "South West Delhi", "West Delhi"],
-  // Default for other states
   Other: ["Other"]
 };
+
 const Field = ({ label, required, children }) => (
   <div className="iq-field">
     <span className="iq-label">
@@ -49,7 +48,6 @@ const Field = ({ label, required, children }) => (
 );
 
 const InquiryForm = ({ onSaved, editData: editDataProp }) => {
-  // Support both prop-driven (standalone) and route-driven (/hostel-add-inquiry/:id) editing
   const { id: routeId } = useParams() || {};
   const [editData, setEditData] = useState(editDataProp || null);
 
@@ -72,12 +70,16 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
 
   const [form, setForm] = useState({ ...emptyForm });
 
-  // Sync form when editData arrives (from route :id load or prop)
   useEffect(() => {
     if (editData) setForm({ ...emptyForm, ...editData });
   }, [editData]);
+
   const [sources, setSources] = useState([]);
   const [saving, setSaving] = useState(false);
+
+  // Success modal state
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successId, setSuccessId] = useState(null);
 
   useEffect(() => {
     getAllSources()
@@ -106,7 +108,6 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
     try {
       const payload = {
         ...form,
-        // map frontend field names → backend field names
         inquiryDate: form.inquiryDate,
       };
 
@@ -120,7 +121,9 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
       window.dispatchEvent(new Event("hostel-inq-updated"));
 
       if (!editData) {
-        alert(`Inquiry submitted successfully.\n\nID: ${result.id}`);
+        // Show custom success modal instead of alert()
+        setSuccessId(result?.id);
+        setShowSuccess(true);
         setForm({ ...emptyForm, inquiryDate: todayStr() });
       }
 
@@ -132,162 +135,189 @@ const InquiryForm = ({ onSaved, editData: editDataProp }) => {
     }
   };
 
+  const closeSuccess = () => {
+    setShowSuccess(false);
+    setSuccessId(null);
+  };
+
   return (
-    <form className="iq" onSubmit={save}>
-      <div className="iq-title">Personal Details</div>
+    <>
+      <form className="iq" onSubmit={save}>
+        {/* ... keep your entire existing form JSX exactly as it is ... */}
+        <div className="iq-title">Personal Details</div>
 
-      <div className="iq-grid3">
-        <Field label="Student Name" required>
-          <input name="studentName" value={form.studentName} onChange={set} required />
-        </Field>
+        <div className="iq-grid3">
+          <Field label="Student Name" required>
+            <input name="studentName" value={form.studentName} onChange={set} required />
+          </Field>
 
-        <Field label="Email" required>
-          <input type="email" name="email" value={form.email} onChange={set} required />
-        </Field>
+          <Field label="Email" required>
+            <input type="email" name="email" value={form.email} onChange={set} required />
+          </Field>
 
-        <Field label="Student Mobile No" required>
-          <input name="studentMobileNo" value={form.studentMobileNo} onChange={set} required />
-        </Field>
+          <Field label="Student Mobile No" required>
+            <input name="studentMobileNo" value={form.studentMobileNo} onChange={set} required />
+          </Field>
 
-        <Field label="Father Name">
-          <input name="fatherName" value={form.fatherName} onChange={set} />
-        </Field>
+          <Field label="Father Name">
+            <input name="fatherName" value={form.fatherName} onChange={set} />
+          </Field>
 
-        <Field label="Father Mobile No">
-          <input name="fatherMobileNo" value={form.fatherMobileNo} onChange={set} />
-        </Field>
+          <Field label="Father Mobile No">
+            <input name="fatherMobileNo" value={form.fatherMobileNo} onChange={set} />
+          </Field>
 
-        <Field label="State">
-          <select name="state" value={form.state} onChange={set}>
-            <option value="">Select State</option>
-            <option>Andhra Pradesh</option>
-            <option>Arunachal Pradesh</option>
-            <option>Assam</option>
-            <option>Bihar</option>
-            <option>Chhattisgarh</option>
-            <option>Goa</option>
-            <option>Gujarat</option>
-            <option>Haryana</option>
-            <option>Himachal Pradesh</option>
-            <option>Jharkhand</option>
-            <option>Karnataka</option>
-            <option>Kerala</option>
-            <option>Madhya Pradesh</option>
-            <option>Maharashtra</option>
-            <option>Manipur</option>
-            <option>Meghalaya</option>
-            <option>Mizoram</option>
-            <option>Nagaland</option>
-            <option>Odisha</option>
-            <option>Punjab</option>
-            <option>Rajasthan</option>
-            <option>Sikkim</option>
-            <option>Tamil Nadu</option>
-            <option>Telangana</option>
-            <option>Tripura</option>
-            <option>Uttar Pradesh</option>
-            <option>Uttarakhand</option>
-            <option>West Bengal</option>
-            {/* Union Territories */}
-            <option>Andaman and Nicobar Islands</option>
-            <option>Chandigarh</option>
-            <option>Dadra and Nagar Haveli and Daman and Diu</option>
-            <option>Delhi</option>
-            <option>Jammu and Kashmir</option>
-            <option>Ladakh</option>
-            <option>Lakshadweep</option>
-            <option>Puducherry</option>
-          </select>
-        </Field>
+          <Field label="State">
+            <select name="state" value={form.state} onChange={set}>
+              <option value="">Select State</option>
+              <option>Andhra Pradesh</option>
+              <option>Arunachal Pradesh</option>
+              <option>Assam</option>
+              <option>Bihar</option>
+              <option>Chhattisgarh</option>
+              <option>Goa</option>
+              <option>Gujarat</option>
+              <option>Haryana</option>
+              <option>Himachal Pradesh</option>
+              <option>Jharkhand</option>
+              <option>Karnataka</option>
+              <option>Kerala</option>
+              <option>Madhya Pradesh</option>
+              <option>Maharashtra</option>
+              <option>Manipur</option>
+              <option>Meghalaya</option>
+              <option>Mizoram</option>
+              <option>Nagaland</option>
+              <option>Odisha</option>
+              <option>Punjab</option>
+              <option>Rajasthan</option>
+              <option>Sikkim</option>
+              <option>Tamil Nadu</option>
+              <option>Telangana</option>
+              <option>Tripura</option>
+              <option>Uttar Pradesh</option>
+              <option>Uttarakhand</option>
+              <option>West Bengal</option>
+              <option>Andaman and Nicobar Islands</option>
+              <option>Chandigarh</option>
+              <option>Dadra and Nagar Haveli and Daman and Diu</option>
+              <option>Delhi</option>
+              <option>Jammu and Kashmir</option>
+              <option>Ladakh</option>
+              <option>Lakshadweep</option>
+              <option>Puducherry</option>
+            </select>
+          </Field>
 
-        <Field label="District">
-          <select name="district" value={form.district} onChange={set}>
-            <option value="">Select District</option>
-            {(STATE_DISTRICTS[form.state] || STATE_DISTRICTS["Other"]).map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
+          <Field label="District">
+            <select name="district" value={form.district} onChange={set}>
+              <option value="">Select District</option>
+              {(STATE_DISTRICTS[form.state] || STATE_DISTRICTS["Other"]).map((d) => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </Field>
+
+          <Field label="Taluka" required>
+            <input name="taluka" value={form.taluka} onChange={set} required />
+          </Field>
+
+          <Field label="City" required>
+            <input name="city" value={form.city} onChange={set} required />
+          </Field>
+
+          <Field label="Pincode" required>
+            <input name="pincode" value={form.pincode} onChange={set} required />
+          </Field>
+
+          <div className="iq-gender">
+            <b>Gender :</b>
+            {["Male", "Female", "Other"].map((g) => (
+              <label key={g}>
+                <input type="radio" name="gender" value={g} checked={form.gender === g} onChange={set} />
+                {g}
+              </label>
             ))}
-          </select>
-        </Field>
-
-        <Field label="Taluka" required>
-          <input name="taluka" value={form.taluka} onChange={set} required />
-        </Field>
-
-        <Field label="City" required>
-          <input name="city" value={form.city} onChange={set} required />
-        </Field>
-
-        <Field label="Pincode" required>
-          <input name="pincode" value={form.pincode} onChange={set} required />
-        </Field>
-
-        <div className="iq-gender">
-          <b>Gender :</b>
-          {["Male", "Female", "Other"].map((g) => (
-            <label key={g}>
-              <input type="radio" name="gender" value={g} checked={form.gender === g} onChange={set} />
-              {g}
-            </label>
-          ))}
+          </div>
         </div>
-      </div>
 
-      <div className="iq-grid1">
-        <Field label="Address" required>
-          <input name="address" value={form.address} onChange={set} required />
-        </Field>
-      </div>
+        <div className="iq-grid1">
+          <Field label="Address" required>
+            <input name="address" value={form.address} onChange={set} required />
+          </Field>
+        </div>
 
-      <div className="iq-title">Additional Information</div>
+        <div className="iq-title">Additional Information</div>
 
-      <div className="iq-grid3">
-        <Field label="Preferred Room Type">
-          <select name="roomType" value={form.roomType} onChange={set}>
-            <option>AC</option>
-            <option>Non-AC</option>
-          </select>
-        </Field>
+        <div className="iq-grid3">
+          <Field label="Preferred Room Type">
+            <select name="roomType" value={form.roomType} onChange={set}>
+              <option>AC</option>
+              <option>Non-AC</option>
+            </select>
+          </Field>
 
-        <Field label="Preferred Bed Type">
-          <select name="bedType" value={form.bedType} onChange={set}>
-            <option>Single</option>
-            <option>Double</option>
-          </select>
-        </Field>
+          <Field label="Preferred Bed Type">
+            <select name="bedType" value={form.bedType} onChange={set}>
+              <option>Single</option>
+              <option>Double</option>
+            </select>
+          </Field>
 
-        <Field label="Number Of Members" required>
-          <input name="numberOfMembers" value={form.numberOfMembers} onChange={set} required />
-        </Field>
+          <Field label="Number Of Members" required>
+            <input name="numberOfMembers" value={form.numberOfMembers} onChange={set} required />
+          </Field>
 
-        <Field label="Course Of Study" required>
-          <input name="courseOfStudy" value={form.courseOfStudy} onChange={set} required />
-        </Field>
+          <Field label="Course Of Study" required>
+            <input name="courseOfStudy" value={form.courseOfStudy} onChange={set} required />
+          </Field>
 
-        <Field label="Source">
-          <select name="source" value={form.source} onChange={set}>
-            <option value="">Select Source</option>
-            {sources.length
-              ? sources.map((s) => <option key={s} value={s}>{s}</option>)
-              : ["Walk-in", "Online", "Referral", "Other"].map((s) => <option key={s}>{s}</option>)
-            }
-          </select>
-        </Field>
+          <Field label="Source">
+            <select name="source" value={form.source} onChange={set}>
+              <option value="">Select Source</option>
+              {sources.length
+                ? sources.map((s) => <option key={s} value={s}>{s}</option>)
+                : ["Walk-in", "Online", "Referral", "Other"].map((s) => <option key={s}>{s}</option>)
+              }
+            </select>
+          </Field>
 
-        <Field label="Date" required>
-          <input type="date" name="inquiryDate" value={form.inquiryDate} onChange={set} required />
-        </Field>
-      </div>
+          <Field label="Date" required>
+            <input type="date" name="inquiryDate" value={form.inquiryDate} onChange={set} required />
+          </Field>
+        </div>
 
-      <p className="iq-note">( All * Marked Fields Are Necessary To Fill )</p>
+        <p className="iq-note">( All * Marked Fields Are Necessary To Fill )</p>
 
-      <div className="iq-submit-wrap">
-        <button type="submit" className="iq-submit" disabled={saving}>
-          {saving ? "Saving..." : "Submit"}
-        </button>
-      </div>
-    </form>
+        <div className="iq-submit-wrap">
+          <button type="submit" className="iq-submit" disabled={saving}>
+            {saving ? "Saving..." : "Submit"}
+          </button>
+        </div>
+      </form>
+
+      {/* ========== SUCCESS MODAL ========== */}
+      {showSuccess && (
+        <div className="iq-success-overlay" onClick={closeSuccess}>
+          <div className="iq-success-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="iq-success-icon">
+              <svg viewBox="0 0 52 52">
+                <circle cx="26" cy="26" r="25" fill="none" stroke="#4CAF50" strokeWidth="2" />
+                <path fill="none" stroke="#4CAF50" strokeWidth="3" d="M14 27l7 7 16-16" />
+              </svg>
+            </div>
+            <h3 className="iq-success-title">Success!</h3>
+            <p className="iq-success-msg">
+              Inquiry created successfully!
+              {successId && <><br />ID: {successId}</>}
+            </p>
+            <button className="iq-success-btn" onClick={closeSuccess}>
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

@@ -52,7 +52,7 @@
   box-sizing: border-box;
 }
 
-.inquiry-search > svg {
+.inquiry-search>svg {
   margin-left: 9px;
   font-size: 13px;
   color: #94a3b8;
@@ -65,7 +65,7 @@
   outline: none;
   background: transparent;
   padding: 0 26px 0 7px;
-  font-size: 10px;
+  font-size: 12px;
   font-family: inherit;
   color: #334155;
 }
@@ -110,7 +110,7 @@
 }
 
 .filter-total span {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   color: #64748b;
 }
@@ -131,7 +131,7 @@
   border-radius: 6px;
   background: #fff;
   color: #334155;
-  font-size: 10px;
+  font-size: 13px;
   font-family: inherit;
   outline: none;
   cursor: pointer;
@@ -147,7 +147,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   color: #64748b;
 }
@@ -203,7 +203,7 @@
   padding: 5px 4px;
   color: #fff;
   text-align: left;
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
@@ -214,7 +214,7 @@
   padding: 4px 4px;
   border-bottom: 1px solid #edf0f4;
   color: #475569;
-  font-size: 8.5px;
+  font-size: 12px;
   vertical-align: middle;
   white-space: nowrap;
   overflow: hidden;
@@ -242,57 +242,79 @@
 .inquiry-table th:nth-child(1),
 .inquiry-table td:nth-child(1) {
   width: 68px;
-} /* ID */
+}
+
+/* ID */
 
 .inquiry-table th:nth-child(2),
 .inquiry-table td:nth-child(2) {
   width: 72px;
-} /* Date */
+}
+
+/* Date */
 
 .inquiry-table th:nth-child(3),
 .inquiry-table td:nth-child(3) {
   width: auto;
-} /* Name (flexible) */
+}
+
+/* Name (flexible) */
 
 .inquiry-table th:nth-child(4),
 .inquiry-table td:nth-child(4) {
   width: 78px;
-} /* Mobile */
+}
+
+/* Mobile */
 
 .inquiry-table th:nth-child(5),
 .inquiry-table td:nth-child(5) {
   width: 16%;
-} /* Email */
+}
+
+/* Email */
 
 .inquiry-table th:nth-child(6),
 .inquiry-table td:nth-child(6) {
   width: 64px;
-} /* City */
+}
+
+/* City */
 
 .inquiry-table th:nth-child(7),
 .inquiry-table td:nth-child(7) {
   width: 74px;
-} /* State */
+}
+
+/* State */
 
 .inquiry-table th:nth-child(8),
 .inquiry-table td:nth-child(8) {
   width: 54px;
-} /* Room */
+}
+
+/* Room */
 
 .inquiry-table th:nth-child(9),
 .inquiry-table td:nth-child(9) {
   width: 52px;
-} /* Bed */
+}
+
+/* Bed */
 
 .inquiry-table th:nth-child(10),
 .inquiry-table td:nth-child(10) {
   width: 92px;
-} /* Status */
+}
+
+/* Status */
 
 .inquiry-table th:nth-child(11),
 .inquiry-table td:nth-child(11) {
   width: 62px;
-} /* Source */
+}
+
+/* Source */
 
 /* ================= INQUIRY NO PILL ================= */
 
@@ -305,7 +327,7 @@
   border-radius: 4px;
   background: #eff6ff;
   color: #2563eb;
-  font-size: 8px;
+  font-size: 12px;
   font-weight: 700;
 }
 
@@ -316,7 +338,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 600;
   color: #1e293b;
 }
@@ -324,7 +346,7 @@
 /* ================= TEXT ================= */
 
 .table-text {
-  font-size: 8.5px;
+  font-size: 12px;
   color: #475569;
   display: inline-block;
   max-width: 100%;
@@ -334,7 +356,7 @@
 }
 
 .table-date {
-  font-size: 8px;
+  font-size: 12px;
   color: #64748b;
 }
 
@@ -348,7 +370,7 @@
   padding: 2px 5px;
   border: none;
   border-radius: 15px;
-  font-size: 7.5px;
+  font-size: 12px;
   font-weight: 700;
   white-space: nowrap;
   max-width: 100%;
@@ -400,7 +422,7 @@
 }
 
 .status-edit-icon {
-  font-size: 8px;
+  font-size: 12px;
   opacity: 0.7;
 }
 
@@ -423,7 +445,7 @@
   border-radius: 5px;
   background: #fff;
   color: #334155;
-  font-size: 8.5px;
+  font-size: 12px;
   font-family: inherit;
   outline: none;
 }
@@ -442,7 +464,7 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 700;
   font-family: inherit;
   line-height: 1;
@@ -488,7 +510,7 @@
   gap: 6px;
   margin-top: 7px;
   padding: 0 2px;
-  font-size: 10px;
+  font-size: 12px;
   color: #64748b;
 }
 
@@ -505,7 +527,7 @@
 
 .inquiry-list-footer .joined-info {
   color: #94a3b8;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 /* ================= PAGINATION ================= */
@@ -530,7 +552,7 @@
   border-radius: 5px;
   background: #fff;
   color: #475569;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
@@ -560,7 +582,7 @@
 .page-ellipsis {
   padding: 0 3px;
   color: #94a3b8;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -606,7 +628,7 @@
   border: none;
   padding: 0;
   font-family: inherit;
-  font-size: 8.5px;
+  font-size: 14px;
   font-weight: 600;
   color: #2563eb;
   cursor: pointer;
@@ -644,7 +666,7 @@
   max-height: 92vh;
   overflow-y: auto;
   background: #fff;
-  border-radius: 9px;
+  border-radius: 13px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
   font-family: inherit;
 }
@@ -700,13 +722,13 @@
 
 /* Additional Information — khali ani CHOTA box */
 
-.id-body > .id-section + .id-section {
+.id-body>.id-section+.id-section {
   width: 72%;
   max-width: 430px;
 }
 
 .id-sec-title {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   color: #2563eb;
   margin-bottom: 4px;
@@ -737,7 +759,7 @@
 
 .id-lab {
   flex: 0 0 92px;
-  font-size: 8.5px;
+  font-size: 12px;
   font-weight: 500;
   color: #94a3b8;
 }
@@ -758,7 +780,7 @@
   border: 1px solid #dce2ea;
   border-radius: 5px;
   padding: 0 7px;
-  font-size: 10px;
+  font-size: 12px;
   font-family: inherit;
   color: #334155;
   background: #fff;
@@ -855,7 +877,7 @@
   gap: 4px;
   border: none;
   border-radius: 12px;
-  font-size: 9px;
+  font-size: 13px;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
