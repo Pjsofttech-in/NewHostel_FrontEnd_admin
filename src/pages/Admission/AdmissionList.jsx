@@ -232,8 +232,14 @@ const AdmissionList = () => {
       const matchesBuilding =
         buildingFilter === "All" || row.building === buildingFilter;
 
+      // const matchesPayment =
+      //   paymentFilter === "All" || (row.paymentStatus || "") === paymentFilter;
+
       const matchesPayment =
-        paymentFilter === "All" || (row.paymentStatus || "") === paymentFilter;
+        paymentFilter === "All" ||
+        (paymentFilter === "Paid" &&
+          (row.paymentStatus === "Paid" || row.paymentStatus === "Completed")) ||
+        (row.paymentStatus || "") === paymentFilter;
 
       const matchesStatus =
         statusFilter === "All" || (row.status || "Active") === statusFilter;
@@ -270,15 +276,16 @@ const AdmissionList = () => {
     filtered.forEach((row) => {
       const st = row.paymentStatus || "";
 
-      if (st === "Paid") {
+      if (st === "Paid" || st === "Completed") {
         paid++;
-      } else if (st === "Partial") {
+      } else if (st === "Partial" || st === "Installment") {
         partial++;
       } else if (st === "Pending") {
         pending++;
       }
 
-      revenue += Number(row.grandTotal) || 0;
+      // Use the same total logic as the table
+      revenue += rowTotal(row);
     });
 
     return {
@@ -406,15 +413,15 @@ const AdmissionList = () => {
     const newPaid = instPaid + amount;
     const updatedSchedules = item?.id
       ? instSchedules.map((schedule) =>
-          schedule.id === item.id
-            ? {
-                ...schedule,
-                status: "Completed",
-                installmentDate: completeInstDate,
-                paymentMode: completeInstMode,
-              }
-            : schedule,
-        )
+        schedule.id === item.id
+          ? {
+            ...schedule,
+            status: "Completed",
+            installmentDate: completeInstDate,
+            paymentMode: completeInstMode,
+          }
+          : schedule,
+      )
       : instSchedules;
 
     persistAdmissionUpdate({
@@ -551,12 +558,12 @@ const AdmissionList = () => {
         beds: (room.beds || []).map((bed) =>
           bed.admissionId === row.id
             ? {
-                ...bed,
-                occupied: false,
-                occupiedBy: null,
-                userNo: null,
-                admissionId: null,
-              }
+              ...bed,
+              occupied: false,
+              occupiedBy: null,
+              userNo: null,
+              admissionId: null,
+            }
             : bed,
         ),
       })),
@@ -695,7 +702,7 @@ const AdmissionList = () => {
 
           {/* BUILDING */}
 
-          <div className="al-field">
+          {/* <div className="al-field">
             <label>Building</label>
 
             <select
@@ -710,7 +717,7 @@ const AdmissionList = () => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
           {/* PAYMENT */}
 
@@ -792,9 +799,9 @@ const AdmissionList = () => {
 
           {/* CLEAR */}
 
-          <button type="button" className="al-clear" onClick={clearFilters}>
+          {/* <button type="button" className="al-clear" onClick={clearFilters}>
             Clear
-          </button>
+          </button> */}
         </div>
       </div>
 
@@ -935,9 +942,8 @@ const AdmissionList = () => {
 
                       <td>
                         <span
-                          className={`al-amount al-balance ${
-                            pending > 0 ? "due" : "clear"
-                          }`}
+                          className={`al-amount al-balance ${pending > 0 ? "due" : "clear"
+                            }`}
                         >
                           {money(pending)}
                         </span>
@@ -1528,7 +1534,7 @@ const AdmissionList = () => {
                   <b>
                     {money(
                       (Number(viewRow.grandTotal) || 0) -
-                        (Number(viewRow.amountPaid) || 0),
+                      (Number(viewRow.amountPaid) || 0),
                     )}
                   </b>
                 </p>

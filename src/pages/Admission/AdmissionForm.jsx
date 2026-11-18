@@ -115,15 +115,15 @@ const SearchableUserSelect = ({
 
   const filtered = text
     ? users.filter((x) =>
-        [
-          String(x.userNo || ""),
-          x.name || "",
-          x.city || "",
-          (x.form || {}).city || "",
-        ]
-          .map((y) => String(y || "").toLowerCase())
-          .some((y) => y.includes(text)),
-      )
+      [
+        String(x.userNo || ""),
+        x.name || "",
+        x.city || "",
+        (x.form || {}).city || "",
+      ]
+        .map((y) => String(y || "").toLowerCase())
+        .some((y) => y.includes(text)),
+    )
     : users;
 
   useEffect(() => {
@@ -378,6 +378,9 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
           floorNumber: r.floorNumber,
           roomType: r.roomType,
           bedType: r.bedType,
+          building: r.building || r.buildingName || "",
+          buildingName: r.building || r.buildingName || "",
+          floor: r.floorNumber || r.floor || "",
         },
       })));
     } catch (err) { console.error("Failed to load students", err); }
@@ -473,9 +476,9 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
 
         mobile: user.phone || f.mobile || "",
 
-        building: f.buildingName || f.building || "",
+        // building: f.buildingName || f.building || "",
 
-        floor: f.depFloor || f.floor || "",
+        // floor: f.depFloor || f.floor || "",
 
         roomType: user.roomType || f.roomType || "",
 
@@ -484,6 +487,9 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
         bedType: user.bedType || f.bedType || "",
 
         bedNumber: f.bedNumber || "",
+
+        building: f.buildingName || f.building || "",
+        floor: f.floorNumber || f.floor || f.depFloor || "",
       };
 
       const stayFrom = f.stayFrom || prev.stayFrom;
@@ -539,11 +545,11 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
       const updatedList = list.map((r) =>
         r.id === editRow.id
           ? {
-              ...r,
-              ...form,
-              totalAmount: totalAmount || "",
-              bank: selectedBank || null,
-            }
+            ...r,
+            ...form,
+            totalAmount: totalAmount || "",
+            bank: selectedBank || null,
+          }
           : r,
       );
 
@@ -673,14 +679,14 @@ const AdmissionForm = ({ editRow = null, onDone, onCancel }) => {
 
         {/* ================= PAYMENT ================= */}
 
-        <Field label="Amount Paid" required>
+        <Field label="Amount" required>
           <input
             type="number"
             min="0"
             name="amountPaid"
             value={form.amountPaid}
             onChange={set}
-            placeholder="Enter paid amount"
+            placeholder="Enter amount paid"
             required
           />
         </Field>

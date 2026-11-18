@@ -90,6 +90,41 @@ const SaveReset = ({ onSave, onReset }) => (
   </div>
 );
 
+const CustomDialog = ({ dialog, onClose }) => {
+  if (!dialog.show) return null;
+
+  return (
+    <div className="rf-dialog-overlay">
+      <div className="rf-dialog-box">
+
+        <div className={`rf-dialog-icon ${dialog.type}`}>
+          {dialog.type === "success" ? (
+            <svg viewBox="0 0 52 52">
+              <circle cx="26" cy="26" r="24" />
+              <path d="M14 27 L22 35 L39 17" />
+            </svg>
+          ) : (
+            <span>!</span>
+          )}
+        </div>
+
+        <h3>{dialog.title}</h3>
+
+        <p>{dialog.message}</p>
+
+        <button
+          type="button"
+          className="rf-dialog-ok"
+          onClick={onClose}
+        >
+          OK
+        </button>
+
+      </div>
+    </div>
+  );
+};
+
 /* ===== MAIN REGISTRATION COMPONENT ===== */
 
 const Registration = ({ onSaved }) => {
@@ -97,6 +132,25 @@ const Registration = ({ onSaved }) => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ ...emptyForm });
+  const [dialog, setDialog] = useState({
+    show: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showDialog = (title, message, type = "success") => {
+    setDialog({
+      show: true,
+      type,
+      title,
+      message,
+    });
+  };
+
+  const closeDialog = () => {
+    setDialog((prev) => ({ ...prev, show: false }));
+  };
 
   // Load existing registration when editing via route /:id
   useEffect(() => {
@@ -129,80 +183,80 @@ const Registration = ({ onSaved }) => {
   const [prefillLoading, setPrefillLoading] = useState(false);
 
   useEffect(() => {
-    getAllFloors().then((data) => setFloors(Array.isArray(data) ? data : [])).catch(() => {});
+    getAllFloors().then((data) => setFloors(Array.isArray(data) ? data : [])).catch(() => { });
   }, []);
 
-const handleFloorChange = async (e) => {
-  const floorId = e.target.value; // String(f.id) from <option>
-  const floor = floors.find((f) => String(f.id) === String(floorId));
+  const handleFloorChange = async (e) => {
+    const floorId = e.target.value; // String(f.id) from <option>
+    const floor = floors.find((f) => String(f.id) === String(floorId));
 
-  setForm((prev) => ({
-    ...prev,
-    floorId: floorId || "",
-    floorNumber: floor?.floorNumber != null ? String(floor.floorNumber) : "",
-    roomNumber: "",
-    bedNumber: "",
-    bedType: "",
-  }));
-  setRooms([]);
-  setBeds([]);
-
-  if (!floor?.id) return;
-
-  try {
-    const r = await getRoomsByFloor(floor.id);
-    const list = Array.isArray(r)
-      ? r
-      : Array.isArray(r?.data)
-        ? r.data
-        : Array.isArray(r?.content)
-          ? r.content
-          : [];
-    setRooms(list);
-  } catch (err) {
-    console.error("getRoomsByFloor failed", err);
+    setForm((prev) => ({
+      ...prev,
+      floorId: floorId || "",
+      floorNumber: floor?.floorNumber != null ? String(floor.floorNumber) : "",
+      roomNumber: "",
+      bedNumber: "",
+      bedType: "",
+    }));
     setRooms([]);
-  }
-};
-
-const handleRoomChange = async (e) => {
-  const roomNumber = e.target.value;
-  setForm((prev) => ({
-    ...prev,
-    roomNumber,
-    bedNumber: "",
-    bedType: "",
-  }));
-  setBeds([]);
-
-  if (!roomNumber) return;
-
-  const room = rooms.find(
-    (r) =>
-      String(r.roomNumber) === String(roomNumber) ||
-      String(r.id) === String(roomNumber)
-  );
-
-  if (!room?.id) {
-    console.warn("Room not found for value:", roomNumber, rooms);
-    return;
-  }
-
-  try {
-    const b = await getBedsByRoom(room.id);
-    const list = Array.isArray(b)
-      ? b
-      : Array.isArray(b?.data)
-        ? b.data
-        : Array.isArray(b?.content)
-          ? b.content
-          : [];
-    setBeds(list);
-  } catch (err) {
-    console.error("getBedsByRoom failed", err);
     setBeds([]);
-  }
-};
+
+    if (!floor?.id) return;
+
+    try {
+      const r = await getRoomsByFloor(floor.id);
+      const list = Array.isArray(r)
+        ? r
+        : Array.isArray(r?.data)
+          ? r.data
+          : Array.isArray(r?.content)
+            ? r.content
+            : [];
+      setRooms(list);
+    } catch (err) {
+      console.error("getRoomsByFloor failed", err);
+      setRooms([]);
+    }
+  };
+
+  const handleRoomChange = async (e) => {
+    const roomNumber = e.target.value;
+    setForm((prev) => ({
+      ...prev,
+      roomNumber,
+      bedNumber: "",
+      bedType: "",
+    }));
+    setBeds([]);
+
+    if (!roomNumber) return;
+
+    const room = rooms.find(
+      (r) =>
+        String(r.roomNumber) === String(roomNumber) ||
+        String(r.id) === String(roomNumber)
+    );
+
+    if (!room?.id) {
+      console.warn("Room not found for value:", roomNumber, rooms);
+      return;
+    }
+
+    try {
+      const b = await getBedsByRoom(room.id);
+      const list = Array.isArray(b)
+        ? b
+        : Array.isArray(b?.data)
+          ? b.data
+          : Array.isArray(b?.content)
+            ? b.content
+            : [];
+      setBeds(list);
+    } catch (err) {
+      console.error("getBedsByRoom failed", err);
+      setBeds([]);
+    }
+  };
 
   const prefillFromInquiry = async () => {
     if (!inquiryIdInput) return;
@@ -225,9 +279,16 @@ const handleRoomChange = async (e) => {
         roomType: data.roomType || prev.roomType,
         bedType: data.bedType || prev.bedType,
       }));
-      alert(`Prefilled from Inquiry ID: ${inquiryIdInput}`);
+      showDialog(
+        "Success!",
+        `Prefilled from Inquiry ID: ${inquiryIdInput}`
+      );
     } catch (err) {
-      alert("Could not load inquiry: " + err.message);
+      showDialog(
+        "Error!",
+        "Could not load inquiry: " + err.message,
+        "error"
+      );
     } finally {
       setPrefillLoading(false);
     }
@@ -270,8 +331,11 @@ const handleRoomChange = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
 
     if (!form.fullName) {
-      alert("Please enter Full Name.");
-      setStep(1);
+      showDialog(
+        "Required Field!",
+        "Please enter Full Name.",
+        "error"
+      ); setStep(1);
       return;
     }
 
@@ -294,8 +358,10 @@ const handleRoomChange = async (e) => {
       });
 
       window.dispatchEvent(new Event("hostel-reg-updated"));
-      alert("Registration completed successfully.");
-      reset();
+      showDialog(
+        "Success!",
+        "Registration completed successfully."
+      ); reset();
       setStep(1);
       if (typeof onSaved === "function") {
         onSaved();
@@ -304,7 +370,11 @@ const handleRoomChange = async (e) => {
         navigate("/superadminclient/layout/layringhosteladmin/hostel-admission/users/report");
       }
     } catch (err) {
-      alert("Registration failed: " + err.message);
+      showDialog(
+        "Error!",
+        "Registration failed: " + err.message,
+        "error"
+      );
     } finally {
       setSaving(false);
     }
@@ -354,13 +424,13 @@ const handleRoomChange = async (e) => {
                 <TextField name="fullName" label="Full Name" value={form.fullName} onChange={set} required />
                 <DateField name="dateOfBirth" label="Date of Birth" value={form.dateOfBirth} onChange={set} required />
                 <SelectField name="bloodGroup" label="Blood Group" value={form.bloodGroup} onChange={set} required
-                  options={["A+","A-","B+","B-","O+","O-","AB+","AB-"]} />
+                  options={["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"]} />
                 <SelectField name="religion" label="Religion" value={form.religion} onChange={set} required
-                  options={["Hindu","Muslim","Christian","Sikh","Buddhist","Jain","Other"]} />
+                  options={["Hindu", "Muslim", "Christian", "Sikh", "Buddhist", "Jain", "Other"]} />
               </div>
               <div className="rf-line2">
-                <RadioField name="gender" label="Gender" value={form.gender} onChange={set} required options={["Male","Female","Other"]} />
-                <RadioField name="maritalStatus" label="Marital Status" value={form.maritalStatus} onChange={set} required options={["Married","Un-Married","Other"]} />
+                <RadioField name="gender" label="Gender" value={form.gender} onChange={set} required options={["Male", "Female", "Other"]} />
+                <RadioField name="maritalStatus" label="Marital Status" value={form.maritalStatus} onChange={set} required options={["Married", "Un-Married", "Other"]} />
                 <TextField name="email" label="Email" value={form.email} onChange={set} required type="email" disabled={!!form.inquiryId} />
               </div>
             </div>
@@ -375,7 +445,7 @@ const handleRoomChange = async (e) => {
             <TextField name="permanentAddress" label="Permanent Address" value={form.permanentAddress} onChange={set} required disabled={!!form.inquiryId} />
             <TextField name="city" label="City" value={form.city} onChange={set} required disabled={!!form.inquiryId} />
             <SelectField name="state" label="State" value={form.state} onChange={set} required disabled={!!form.inquiryId}
-              options={["Maharashtra","Gujarat","Karnataka","Delhi","Other"]} />
+              options={["Maharashtra", "Gujarat", "Karnataka", "Delhi", "Other"]} />
           </div>
           <div className="rf-ct2">
             <TextField name="pincode" label="Pincode" value={form.pincode} onChange={set} required disabled={!!form.inquiryId} />
@@ -383,8 +453,15 @@ const handleRoomChange = async (e) => {
             <TextField name="parentsMobNo" label="Parent's Mobile" value={form.parentsMobNo} onChange={set} required disabled={!!form.inquiryId} />
           </div>
 
-          <SaveReset onSave={() => alert("Draft saved locally.")} onReset={reset} />
-          <div className="rf-nav">
+          <SaveReset
+            onSave={() =>
+              showDialog(
+                "Success!",
+                "Draft saved locally."
+              )
+            }
+            onReset={reset}
+          />          <div className="rf-nav">
             <button type="button" className="rf-back" disabled>Back</button>
             <button type="submit" className="rf-next">Next</button>
           </div>
@@ -404,11 +481,18 @@ const handleRoomChange = async (e) => {
             <TextField name="familyDoctorFullName" label="Family Doctor Name" value={form.guardianMedical.familyDoctorFullName} onChange={setGuardian} />
             <TextField name="doctormobileNo" label="Doctor Mobile" value={form.guardianMedical.doctormobileNo} onChange={setGuardian} />
             <SelectField name="vehicleType" label="Vehicle Type" value={form.guardianMedical.vehicleType} onChange={setGuardian}
-              options={["Two-Wheeler","Four-Wheeler","None"]} />
+              options={["Two-Wheeler", "Four-Wheeler", "None"]} />
             <TextField name="registrationNo" label="Vehicle Reg No" value={form.guardianMedical.registrationNo} onChange={setGuardian} />
           </div>
-          <SaveReset onSave={() => alert("Draft saved locally.")} onReset={reset} />
-          <div className="rf-nav">
+          <SaveReset
+            onSave={() =>
+              showDialog(
+                "Success!",
+                "Draft saved."
+              )
+            }
+            onReset={reset}
+          />          <div className="rf-nav">
             <button type="button" className="rf-next" onClick={() => setStep(1)}>Back</button>
             <button type="submit" className="rf-next">Next</button>
           </div>
@@ -427,8 +511,15 @@ const handleRoomChange = async (e) => {
             <TextField name="designation" label="Designation" value={form.designation} onChange={set} />
             <TextField name="yearOfJoining" label="Year of Joining" value={form.yearOfJoining} onChange={set} />
           </div>
-          <SaveReset onSave={() => alert("Draft saved locally.")} onReset={reset} />
-          <div className="rf-nav">
+          <SaveReset
+            onSave={() =>
+              showDialog(
+                "Success!",
+                "Draft saved."
+              )
+            }
+            onReset={reset}
+          />          <div className="rf-nav">
             <button type="button" className="rf-next" onClick={() => setStep(2)}>Back</button>
             <button type="submit" className="rf-next">Next</button>
           </div>
@@ -441,9 +532,9 @@ const handleRoomChange = async (e) => {
           <div className="rf-title">Document Proofs</div>
           <div className="rf-grid3 rf-dark-labels">
             <SelectField name="addressProofType" label="Address Proof Type" value={form.addressProofType} onChange={set}
-              options={["Aadhaar","Passport","Voter ID","Utility Bill"]} />
+              options={["Aadhaar", "Passport", "Voter ID", "Utility Bill"]} />
             <SelectField name="educationProofType" label="Education Proof Type" value={form.educationProofType} onChange={set}
-              options={["Admission Letter","Bonafied Certificate","ID Card","Offer Letter"]} />
+              options={["Admission Letter", "Bonafied Certificate", "ID Card", "Offer Letter"]} />
           </div>
 
           <div className="rf-grid2">
@@ -475,25 +566,28 @@ const handleRoomChange = async (e) => {
 
           <div className="rf-title">Room / Bed Assignment</div>
           <div className="rf-grid4 deposit-grid rf-dark-labels">
-            <select
-  name="floorNumber"
-  value={form.floorId || ""}
-  onChange={handleFloorChange}
-  required
->
-  <option value=""></option>
-  {floors.map((f) => (
-    <option key={f.id} value={String(f.id)}>
-      {f.hostelBuildingName || "Floor"} — {f.floorNumber}
-    </option>
-  ))}
-</select>
+            <div>
+              <select
+                label="Building Name | Floor"
+                name="floorNumber"
+                value={form.floorId || ""}
+                onChange={handleFloorChange}
+                required
+              >
+                <option value="">Select Building | Floor</option>
+                {floors.map((f) => (
+                  <option key={f.id} value={String(f.id)}>
+                    {f.hostelBuildingName || "Floor"} — {f.floorNumber}
+                  </option>
+                ))}
+              </select>
+            </div>
             <SelectField name="roomType" label="Room Type" value={form.roomType} onChange={set}
-              options={["AC","Non-AC"]} disabled={!!form.inquiryId} />
+              options={["AC", "Non-AC"]} disabled={!!form.inquiryId} />
             <SelectField name="roomNumber" label="Room No" value={form.roomNumber} onChange={handleRoomChange} required
               options={rooms.map((r) => r.roomNumber || String(r.id))} />
             <SelectField name="bedType" label="Bed Type" value={form.bedType} onChange={set}
-              options={["Single","Double"]} disabled={!!form.inquiryId} />
+              options={["Single", "Double"]} disabled={!!form.inquiryId} />
           </div>
           <div className="rf-grid4 deposit-grid rf-dark-labels">
             <SelectField name="bedNumber" label="Bed No" value={form.bedNumber} onChange={set}
@@ -504,7 +598,7 @@ const handleRoomChange = async (e) => {
           </div>
           <div className="rf-grid3 rf-dark-labels">
             <SelectField name="paymentMode" label="Payment Mode" value={form.paymentMode} onChange={set}
-              options={["Cash","UPI","Online","Bank Transfer","Cheque"]} />
+              options={["Cash", "UPI", "Online", "Bank Transfer", "Cheque"]} />
             <TextField name="transactionNumber" label="Transaction No" value={form.transactionNumber} onChange={set} />
             <TextField name="remark" label="Remark" value={form.remark} onChange={set} />
           </div>
@@ -529,7 +623,7 @@ const handleRoomChange = async (e) => {
           <div className="rf-grid2">
             <DateField name="admissionDate" label="Admission Date" value={form.admissionDate} onChange={set} required />
             <SelectField name="status" label="Status" value={form.status} onChange={set}
-              options={["ACTIVE","PENDING","CANCEL","REFUND"]} />
+              options={["ACTIVE", "PENDING", "CANCEL", "REFUND"]} />
           </div>
 
           <SaveReset onSave={() => alert("Draft saved locally.")} onReset={reset} />
@@ -541,6 +635,11 @@ const handleRoomChange = async (e) => {
           </div>
         </form>
       )}
+      {/* CUSTOM SUCCESS / ERROR DIALOG */}
+      <CustomDialog
+        dialog={dialog}
+        onClose={closeDialog}
+      />
     </div>
   );
 };

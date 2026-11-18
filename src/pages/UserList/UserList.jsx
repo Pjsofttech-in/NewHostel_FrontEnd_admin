@@ -178,7 +178,7 @@ const UserList = () => {
             </>
           )}
 
-          <button type="button" className="ul-clear" onClick={clearFilters}>Clear</button>
+          {/* <button type="button" className="ul-clear" onClick={clearFilters}>Clear</button> */}
         </div>
       </div>
 

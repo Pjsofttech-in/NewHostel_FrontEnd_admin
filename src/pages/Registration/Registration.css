@@ -896,3 +896,109 @@ form.rf-box,
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ===== CUSTOM SUCCESS DIALOG ===== */
+
+.rf-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.40);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  padding: 15px;
+}
+
+.rf-dialog-box {
+  width: 270px;
+  min-height: 265px;
+  background: #fff;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px 20px 20px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
+  animation: rfDialogShow 0.25s ease-out;
+  text-align: center;
+}
+
+@keyframes rfDialogShow {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Green success circle */
+
+.rf-dialog-icon {
+  width: 78px;
+  height: 78px;
+  margin-bottom: 20px;
+}
+
+.rf-dialog-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: #a5d995;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rf-dialog-icon.error {
+  border: 3px solid #f27474;
+  border-radius: 50%;
+  color: #f27474;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 48px;
+  font-weight: 300;
+}
+
+/* Dialog title */
+
+.rf-dialog-box h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #555;
+  margin: 0 0 15px;
+}
+
+/* Dialog message */
+
+.rf-dialog-box p {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 25px;
+  line-height: 1.5;
+}
+
+/* OK button */
+
+.rf-dialog-ok {
+  background: #378bd1;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 16px;
+  min-width: 45px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rf-dialog-ok:hover {
+  background: #2677bd;
+}
