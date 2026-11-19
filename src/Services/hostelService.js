@@ -1,99 +1,93 @@
-// =====================================================
-//  Hostel Infrastructure Services
-//  Floor / Room / Bed / Source
-// =====================================================
-
 import { api } from "./api.js";
+
+/* ================== HOSTEL BUILDING ================== */
+
+export const createBuilding = (data, role, email) =>
+  api.post("/hostelBuilding/create", data, { role, email });
+
+export const getBuildingById = (id, role, email) =>
+  api.get(`/hostelBuilding/${id}`, { role, email });
+
+export const getAllBuildings = (branchCode, role, email) =>
+  api.get("/hostelBuilding/all", { branchCode, role, email });
+
+export const updateBuilding = (id, data, role, email) =>
+  api.put(`/hostelBuilding/update/${id}`, data, { role, email });
+
+export const deleteBuilding = (id, role, email) =>
+  api.delete(`/hostelBuilding/delete/${id}`, { role, email });
+
 
 /* ================== FLOOR ================== */
 
-export async function createFloor(floorData) {
-  return api.post("/createFloor", floorData);
-}
+export const createFloor = (buildingId, floorData, role, email) =>
+  api.post("/createFloor", floorData, { role, email, buildingId });
 
-export async function updateFloor(id, floorData) {
-  return api.put(`/updateFloor/${id}`, floorData);
-}
+export const updateFloor = (id, buildingId, floorData, role, email) =>
+  api.put(`/updateFloor/${id}/${buildingId}`, floorData, { role, email });
 
-export async function getAllFloors() {
-  return api.get("/getAllFloor");
-}
+export const getAllFloors = (buildingId, role, email) =>
+  api.get(`/getAllFloor/${buildingId}`, { role, email });
 
-export async function getFloorById(id) {
-  return api.get(`/getFloorById/${id}`);
-}
+export const getFloorById = (id, role, email) =>
+  api.get(`/getFloorById/${id}`, { role, email });
 
-export async function deleteFloor(id) {
-  return api.delete(`/deleteFloor/${id}`);
-}
+export const deleteFloor = (id, role, email) =>
+  api.delete(`/deleteFloor/${id}`, { role, email });
+
 
 /* ================== ROOM ================== */
 
-export async function createRoom(floorId, roomData) {
-  return api.post("/createRoom", roomData, { floorId });
-}
+export const createRoom = (floorId, roomData, role, email) =>
+  api.post("/createRoom", roomData, { role, email, floorId });
 
-export async function updateRoom(id, roomData) {
-  return api.put(`/updateRoom/${id}`, roomData);
-}
+export const updateRoom = (id, roomData, role, email) =>
+  api.put(`/updateRoom/${id}`, roomData, { role, email });
 
-export async function getRoomsByFloor(floorId) {
-  return api.get(`/getRoomsByFloor/${floorId}`);
-}
+export const getRoomsByFloor = (floorId, role, email) =>
+  api.get(`/getRoomsByFloor/${floorId}`, { role, email });
 
-export async function getRoomById(id) {
-  return api.get(`/getRoomById/${id}`);
-}
+export const getRoomById = (id, role, email) =>
+  api.get(`/getRoomById/${id}`, { role, email });
 
-export async function deleteRoom(id) {
-  return api.delete(`/deleteRoomById/${id}`);
-}
+export const deleteRoom = (id, role, email) =>
+  api.delete(`/deleteRoomById/${id}`, { role, email });
+
 
 /* ================== BED ================== */
 
-export async function createBed(bedData, roomId) {
-  return api.post("/createBed", bedData, { roomId });   // ← roomId added
-}
+export const createBed = (roomId, bedData, role, email) =>
+  api.post("/createBed", bedData, { role, email, roomId });
 
-export async function updateBed(id, bedData) {
-  return api.put(`/updateBed/${id}`, bedData);
-}
+export const updateBed = (id, bedData, role, email) =>
+  api.put(`/updateBed/${id}`, bedData, { role, email });
 
-export async function getAllBeds() {
-  return api.get("/getAllBed");
-}
+export const getAllBeds = (role, email) =>
+  api.get("/getAllBed", { role, email });
 
-export async function getBedById(id) {
-  return api.get(`/getBedById/${id}`);
-}
+export const getBedById = (id, role, email) =>
+  api.get(`/getBedById/${id}`, { role, email });
 
-export async function getBedsByRoom(roomId) {
-  return api.get("/getBedsByRoom", { roomId });
-}
+export const getBedsByRoom = (roomId, role, email) =>
+  api.get("/getBedsByRoom", { roomId, role, email });
 
-export async function deleteBed(id) {
-  return api.delete(`/deleteBedById/${id}`);
-}
+export const deleteBed = (id, role, email) =>
+  api.delete(`/deleteBedById/${id}`, { role, email });
 
 
 /* ================== SOURCE ================== */
 
-export async function createSource(sourceData) {
-  return api.post("/createSource", sourceData);
-}
+export const createSource = (sourceData, role, email) =>
+  api.post("/createSource", sourceData, { role, email });
 
-export async function updateSource(id, sourceData) {
-  return api.put(`/updateSource/${id}`, sourceData);
-}
+export const updateSource = (id, sourceData, role, email) =>
+  api.put(`/updateSource/${id}`, sourceData, { role, email });
 
-export async function getAllSources() {
-  return api.get("/getAllSource");
-}
+export const getAllSources = (role, email) =>
+  api.get("/getAllSource", { role, email });
 
-export async function getSourceById(id) {
-  return api.get(`/getSourceById/${id}`);
-}
+export const getSourceById = (id, role, email) =>
+  api.get(`/getSourceById/${id}`, { role, email });
 
-export async function deleteSource(id) {
-  return api.delete(`/deleteSource/${id}`);
-}
+export const deleteSource = (id, role, email) =>
+  api.delete(`/deleteSource/${id}`, { role, email });

@@ -1,28 +1,29 @@
 import React, { useCallback, useEffect, useState } from "react";
-// import { FaBed, FaCalendarAlt, FaGavel, FaPen, FaTrashAlt, FaUniversity } from "react-icons/fa";
 import { MdKingBed } from "react-icons/md";
 import "./AdmissionSettings.css";
 import {
+  // Building
+  getAllBuildings, createBuilding, updateBuilding, deleteBuilding,
+  // Floor
   getAllFloors, createFloor, updateFloor, deleteFloor as apiDeleteFloor,
-  getAllSources, createSource, updateSource, deleteSource as apiDeleteSource,
+  // Room
   getRoomsByFloor, createRoom, updateRoom, deleteRoom as apiDeleteRoom,
-  getAllBeds, createBed, updateBed, deleteBed as apiDeleteBed, getBedsByRoom,
+  // Bed
+  getBedsByRoom, createBed, updateBed, deleteBed as apiDeleteBed,
+  // Source
+  getAllSources, createSource, updateSource, deleteSource as apiDeleteSource,
 } from "../../services/hostelService.js";
 import {
-  FaBed, FaCalendarAlt, FaGavel, FaPen, FaTrashAlt, FaUniversity,
+  FaBed, FaGavel, FaPen, FaTrashAlt, FaUniversity,
   FaWhatsapp, FaYoutube, FaTelegram, FaReddit, FaInstagram,
   FaFacebook, FaTwitter, FaLinkedin, FaBullhorn, FaNewspaper,
-  FaBookOpen, FaWalking
+  FaBookOpen, FaWalking, FaBuilding
 } from "react-icons/fa";
 
-const LEAVE_KEY = "hostel-admission-leaves";
 const BANKS_KEY = "hostel-banks";
 const RULES_KEY = "hostel-rules";
 
-const emptyLeave = { userId: "", name: "", from: "", to: "", reason: "", remark: "" };
 const emptyBank = { bankName: "", accountHolder: "", accountNumber: "", confirmAccount: "", ifsc: "", branch: "", upiId: "", remark: "" };
-
-const BedIcon = ({ double }) => double ? <MdKingBed className="as-bed-dbl" /> : <FaBed className="as-bed-sgl" />;
 
 const readLocal = (key, fb) => {
   try { return JSON.parse(localStorage.getItem(key) || "null") ?? fb; }
@@ -30,40 +31,48 @@ const readLocal = (key, fb) => {
 };
 
 const AdmissionSettings = () => {
+  // Get role & email from your auth (adjust as per your project)
+  const role = sessionStorage.getItem("role") || "BRANCH";
+const email = sessionStorage.getItem("email") || "";
+const branchCode = sessionStorage.getItem("branchCode") || "";
+
   const [section, setSection] = useState("rooms");
 
-  // Floors from API
+  // Hierarchy states
+  const [buildings, setBuildings] = useState([]);
+  const [selectedBuilding, setSelectedBuilding] = useState(null);
   const [floors, setFloors] = useState([]);
   const [selectedFloor, setSelectedFloor] = useState(null);
   const [rooms, setRooms] = useState([]);
-  const [beds, setBeds] = useState([]); // all beds (for display)
 
-  // Modals
+  // Building modal
+  const [openBuilding, setOpenBuilding] = useState(false);
+  const [editBuilding, setEditBuilding] = useState(null);
+  const [buildingForm, setBuildingForm] = useState({ buildingName: "" });
+
+  // Floor modal
   const [openFloor, setOpenFloor] = useState(false);
   const [editFloor, setEditFloor] = useState(null);
-  const [floorForm, setFloorForm] = useState({ floorNumber: "", hostelBuildingName: "" });
+  const [floorForm, setFloorForm] = useState({ floorNumber: "" });
 
+  // Room modal
   const [openRoom, setOpenRoom] = useState(false);
   const [editRoom, setEditRoom] = useState(null);
   const [roomForm, setRoomForm] = useState({ roomNumber: "", roomType: "AC", totalBeds: "" });
 
+  // Bed modal
   const [openBed, setOpenBed] = useState(false);
   const [editBed, setEditBed] = useState(null);
   const [bedRoomId, setBedRoomId] = useState(null);
   const [bedForm, setBedForm] = useState({ bedNumber: "", bedType: "Single", status: "AVAILABLE" });
 
-  // Sources from API
+  // Sources
   const [sources, setSources] = useState([]);
   const [openSource, setOpenSource] = useState(false);
   const [editSource, setEditSource] = useState(null);
   const [sourceForm, setSourceForm] = useState({ source: "" });
 
   // Local data
-  const [leaves, setLeaves] = useState(() => readLocal(LEAVE_KEY, []));
-  const [openLeave, setOpenLeave] = useState(false);
-  const [leaveForm, setLeaveForm] = useState(emptyLeave);
-  const [leaveFilter, setLeaveFilter] = useState({ status: "All", start: "", end: "" });
-
   const [banks, setBanks] = useState(() => readLocal(BANKS_KEY, []));
   const [openBank, setOpenBank] = useState(false);
   const [editBank, setEditBank] = useState(null);
@@ -73,22 +82,33 @@ const AdmissionSettings = () => {
   const [rules, setRules] = useState(() => readLocal(RULES_KEY, []));
   const [ruleText, setRuleText] = useState("");
 
-  // ---- Load floors ----
-  const loadFloors = useCallback(async () => {
-    try { setFloors(await getAllFloors()); }
-    catch (err) { console.error(err); }
-  }, []);
+  // ===================== LOADERS =====================
+  const loadBuildings = useCallback(async () => {
+    try {
+      const data = await getAllBuildings(branchCode, role, email);
+      setBuildings(data || []);
+    } catch (err) {
+      console.error("Failed to load buildings:", err);
+    }
+  }, [branchCode, role, email]);
 
-  // ---- Load rooms for selected floor ----
+  const loadFloors = useCallback(async (buildingId) => {
+    try {
+      const data = await getAllFloors(buildingId, role, email);
+      setFloors(data || []);
+    } catch (err) {
+      console.error("Failed to load floors:", err);
+    }
+  }, [role, email]);
+
   const loadRooms = useCallback(async (floorId) => {
     try {
-      const roomsData = await getRoomsByFloor(floorId);
+      const roomsData = await getRoomsByFloor(floorId, role, email);
 
-      // Load beds for each room
       const roomsWithBeds = await Promise.all(
-        roomsData.map(async (room) => {
+        (roomsData || []).map(async (room) => {
           try {
-            const beds = await getBedsByRoom(room.id);
+            const beds = await getBedsByRoom(room.id, role, email);
             return { ...room, beds: beds || [] };
           } catch {
             return { ...room, beds: [] };
@@ -98,77 +118,142 @@ const AdmissionSettings = () => {
 
       setRooms(roomsWithBeds);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load rooms:", err);
     }
-  }, []);
+  }, [role, email]);
 
-  // ---- Load beds for a room ----
-  const loadBedsForRoom = useCallback(async (roomId) => {
-    try { return await getBedsByRoom(roomId); }
-    catch { return []; }
-  }, []);
-
-  // ---- Load sources ----
   const loadSources = useCallback(async () => {
-    try { setSources(await getAllSources()); }
-    catch { setSources([]); }
-  }, []);
-
-  useEffect(() => { loadFloors(); loadSources(); }, [loadFloors, loadSources]);
+    try {
+      const data = await getAllSources(role, email);
+      setSources(data || []);
+    } catch {
+      setSources([]);
+    }
+  }, [role, email]);
 
   useEffect(() => {
-    if (selectedFloor) loadRooms(selectedFloor.id);
+    loadBuildings();
+    loadSources();
+  }, [loadBuildings, loadSources]);
+
+  useEffect(() => {
+    if (selectedBuilding) {
+      loadFloors(selectedBuilding.id);
+    }
+  }, [selectedBuilding, loadFloors]);
+
+  useEffect(() => {
+    if (selectedFloor) {
+      loadRooms(selectedFloor.id);
+    }
   }, [selectedFloor, loadRooms]);
 
-  // Save leaves / banks / rules to localStorage
-  useEffect(() => { localStorage.setItem(LEAVE_KEY, JSON.stringify(leaves)); }, [leaves]);
   useEffect(() => { localStorage.setItem(BANKS_KEY, JSON.stringify(banks)); }, [banks]);
   useEffect(() => { localStorage.setItem(RULES_KEY, JSON.stringify(rules)); }, [rules]);
 
-  /* ========== FLOOR CRUD ========== */
-  const saveFloor = async (e) => {
+  // ===================== BUILDING CRUD =====================
+  const saveBuilding = async (e) => {
     e.preventDefault();
     try {
-      if (editFloor) {
-        await updateFloor(editFloor.id, floorForm);
+      if (editBuilding) {
+        await updateBuilding(editBuilding.id, buildingForm, role, email);
       } else {
-        await createFloor(floorForm);
+        await createBuilding({ ...buildingForm, createdByEmail: email, role }, role, email);
       }
-      await loadFloors();
-      setOpenFloor(false); setEditFloor(null);
-      setFloorForm({ floorNumber: "", hostelBuildingName: "" });
-    } catch (err) { alert("Failed: " + err.message); }
+      await loadBuildings();
+      setOpenBuilding(false);
+      setEditBuilding(null);
+      setBuildingForm({ buildingName: "" });
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
+  };
+
+  const handleDeleteBuilding = async (b) => {
+    if (!window.confirm(`Delete building "${b.buildingName}"?`)) return;
+    try {
+      await deleteBuilding(b.id, role, email);
+      await loadBuildings();
+      if (selectedBuilding?.id === b.id) {
+        setSelectedBuilding(null);
+        setFloors([]);
+        setSelectedFloor(null);
+        setRooms([]);
+      }
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
+  };
+
+  // ===================== FLOOR CRUD =====================
+  const saveFloor = async (e) => {
+    e.preventDefault();
+    if (!selectedBuilding) {
+    alert("No building selected!");
+    return;
+  }
+
+  console.log("Creating floor for buildingId:", selectedBuilding.id); // ← check this
+    if (!selectedBuilding) return;
+    try {
+      if (editFloor) {
+        await updateFloor(editFloor.id, selectedBuilding.id, floorForm, role, email);
+      } else {
+        await createFloor(selectedBuilding.id, floorForm, role, email);
+      }
+      await loadFloors(selectedBuilding.id);
+      setOpenFloor(false);
+      setEditFloor(null);
+      setFloorForm({ floorNumber: "" });
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
   };
 
   const handleDeleteFloor = async (f) => {
     if (!window.confirm(`Delete floor "${f.floorNumber}"?`)) return;
-    try { await apiDeleteFloor(f.id); await loadFloors(); setSelectedFloor(null); }
-    catch (err) { alert("Failed: " + err.message); }
+    try {
+      await apiDeleteFloor(f.id, role, email);
+      await loadFloors(selectedBuilding.id);
+      if (selectedFloor?.id === f.id) {
+        setSelectedFloor(null);
+        setRooms([]);
+      }
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
   };
 
-  /* ========== ROOM CRUD ========== */
+  // ===================== ROOM CRUD =====================
   const saveRoom = async (e) => {
     e.preventDefault();
     if (!selectedFloor) return;
     try {
       if (editRoom) {
-        await updateRoom(editRoom.id, roomForm);
+        await updateRoom(editRoom.id, roomForm, role, email);
       } else {
-        await createRoom(selectedFloor.id, roomForm);
+        await createRoom(selectedFloor.id, roomForm, role, email);
       }
       await loadRooms(selectedFloor.id);
-      setOpenRoom(false); setEditRoom(null);
+      setOpenRoom(false);
+      setEditRoom(null);
       setRoomForm({ roomNumber: "", roomType: "AC", totalBeds: "" });
-    } catch (err) { alert("Failed: " + err.message); }
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
   };
 
   const handleDeleteRoom = async (room) => {
     if (!window.confirm(`Delete room "${room.roomNumber}"?`)) return;
-    try { await apiDeleteRoom(room.id); await loadRooms(selectedFloor.id); }
-    catch (err) { alert("Failed: " + err.message); }
+    try {
+      await apiDeleteRoom(room.id, role, email);
+      await loadRooms(selectedFloor.id);
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
   };
 
-  /* ========== BED CRUD ========== */
+  // ===================== BED CRUD =====================
   const openAddBed = (roomId) => {
     setBedRoomId(roomId);
     setBedForm({ bedNumber: "", bedType: "Single", status: "AVAILABLE" });
@@ -180,89 +265,88 @@ const AdmissionSettings = () => {
     e.preventDefault();
     try {
       if (editBed) {
-        await updateBed(editBed.id, bedForm);
+        await updateBed(editBed.id, bedForm, role, email);
       } else {
-        // Pass roomId as second argument
-        await createBed(bedForm, bedRoomId);
+        await createBed(bedRoomId, bedForm, role, email);
       }
       await loadRooms(selectedFloor.id);
       setOpenBed(false);
       setEditBed(null);
       setBedRoomId(null);
     } catch (err) {
-      alert("Failed: " + err.message);
+      alert("Failed: " + (err?.message || err));
     }
   };
 
   const handleDeleteBed = async (bed) => {
     if (!window.confirm(`Delete bed "${bed.bedNumber}"?`)) return;
-    try { await apiDeleteBed(bed.id); await loadRooms(selectedFloor.id); }
-    catch (err) { alert("Failed: " + err.message); }
+    try {
+      await apiDeleteBed(bed.id, role, email);
+      await loadRooms(selectedFloor.id);
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
   };
 
-  /* ========== SOURCE CRUD ========== */
+  // ===================== SOURCE CRUD =====================
   const saveSource = async (e) => {
     e.preventDefault();
     try {
       if (editSource) {
-        await updateSource(editSource.id, sourceForm);
+        await updateSource(editSource.id, sourceForm, role, email);
       } else {
-        await createSource(sourceForm);
+        await createSource(sourceForm, role, email);
       }
       await loadSources();
-      setOpenSource(false); setEditSource(null); setSourceForm({ source: "" });
-    } catch (err) { alert("Failed: " + err.message); }
+      setOpenSource(false);
+      setEditSource(null);
+      setSourceForm({ source: "" });
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
+    }
   };
 
   const handleDeleteSource = async (s) => {
     if (!window.confirm(`Delete source "${s.source}"?`)) return;
-    try { await apiDeleteSource(s.id); await loadSources(); }
-    catch (err) { alert("Failed: " + err.message); }
-  };
-
-  /* ========== LEAVE CRUD (local) ========== */
-  const saveLeave = (e) => {
-    e.preventDefault();
-    if (!leaveForm.userId || !leaveForm.name || !leaveForm.from || !leaveForm.to) {
-      alert("User ID, name and dates are required."); return;
+    try {
+      await apiDeleteSource(s.id, role, email);
+      await loadSources();
+    } catch (err) {
+      alert("Failed: " + (err?.message || err));
     }
-    setLeaves((prev) => [...prev, { id: Date.now(), ...leaveForm, status: "Pending" }]);
-    setOpenLeave(false); setLeaveForm(emptyLeave);
   };
 
-  /* ========== BANK CRUD (local) ========== */
+  // ===================== BANK & RULES (local) =====================
   const saveBank = (e) => {
     e.preventDefault();
     if (!bankForm.bankName || !bankForm.accountHolder || !bankForm.accountNumber || !bankForm.ifsc) {
-      setBankError("Bank Name, Account Holder, Account Number and IFSC are required."); return;
+      setBankError("Bank Name, Account Holder, Account Number and IFSC are required.");
+      return;
     }
     if (bankForm.accountNumber !== bankForm.confirmAccount) {
-      setBankError("Account numbers do not match."); return;
+      setBankError("Account numbers do not match.");
+      return;
     }
     const data = { id: editBank ? editBank.id : Date.now(), ...bankForm };
     setBanks((prev) => editBank ? prev.map((b) => b.id === editBank.id ? data : b) : [...prev, data]);
-    localStorage.setItem(BANKS_KEY, JSON.stringify(banks));
-    window.dispatchEvent(new Event("hostel-data-updated"));
-    setOpenBank(false); setBankError(""); setEditBank(null); setBankForm(emptyBank);
+    setOpenBank(false);
+    setBankError("");
+    setEditBank(null);
+    setBankForm(emptyBank);
   };
 
-  /* ========== RULES (local) ========== */
   const addRule = () => {
-    if (!ruleText.trim()) { alert("Please type a rule first."); return; }
-    const next = [...rules, { id: Date.now(), text: ruleText.trim() }];
-    setRules(next); localStorage.setItem(RULES_KEY, JSON.stringify(next)); setRuleText("");
-  };
-  const deleteRule = (id) => {
-    const next = rules.filter((r) => r.id !== id);
-    setRules(next); localStorage.setItem(RULES_KEY, JSON.stringify(next));
+    if (!ruleText.trim()) {
+      alert("Please type a rule first.");
+      return;
+    }
+    setRules((prev) => [...prev, { id: Date.now(), text: ruleText.trim() }]);
+    setRuleText("");
   };
 
-  const shownLeaves = leaves.filter((l) => {
-    if (leaveFilter.status !== "All" && l.status !== leaveFilter.status) return false;
-    if (leaveFilter.start && l.to < leaveFilter.start) return false;
-    if (leaveFilter.end && l.from > leaveFilter.end) return false;
-    return true;
-  });
+  const deleteRule = (id) => {
+    setRules((prev) => prev.filter((r) => r.id !== id));
+  };
 
   return (
     <div className="as-page">
@@ -270,11 +354,15 @@ const AdmissionSettings = () => {
         {[
           { id: "rooms", icon: <FaBed />, label: "Rooms" },
           { id: "sources", icon: <FaGavel />, label: "Sources" },
-          // { id: "leave", icon: <FaCalendarAlt />, label: "Leave" },
           { id: "bank", icon: <FaUniversity />, label: "Bank" },
           { id: "rules", icon: <FaGavel />, label: "Rules" },
         ].map(({ id, icon, label }) => (
-          <button key={id} type="button" className={section === id ? "as-rail-btn on" : "as-rail-btn"} onClick={() => setSection(id)}>
+          <button
+            key={id}
+            type="button"
+            className={section === id ? "as-rail-btn on" : "as-rail-btn"}
+            onClick={() => setSection(id)}
+          >
             <span className="as-ico">{icon}</span>
             <span className="as-rail-text">{label}</span>
           </button>
@@ -282,143 +370,254 @@ const AdmissionSettings = () => {
       </aside>
 
       <section className="as-main">
-
-        {/* ========== ROOMS ========== */}
-        {section === "rooms" && !selectedFloor && (
+        {/* ===================== ROOMS SECTION ===================== */}
+        {section === "rooms" && (
           <>
-            <div className="as-top">
-              <button type="button" className="as-add-btn" onClick={() => { setOpenFloor(true); setEditFloor(null); setFloorForm({ floorNumber: "", hostelBuildingName: "" }); }}>
-                Add Floor
-              </button>
-            </div>
-            <div className="as-board">
-              <div className="as-grid">
-                {floors.map((f) => (
-                  <div key={f.id} className="as-card as-card-btn" onClick={() => setSelectedFloor(f)}>
-                    <div className="as-card-actions">
-                      <button type="button" className="as-ico-btn edit" onClick={(e) => { e.stopPropagation(); setEditFloor(f); setFloorForm({ floorNumber: f.floorNumber, hostelBuildingName: f.hostelBuildingName || "" }); setOpenFloor(true); }}><FaPen /></button>
-                      <button type="button" className="as-ico-btn del" onClick={(e) => { e.stopPropagation(); handleDeleteFloor(f); }}><FaTrashAlt /></button>
-                    </div>
-                    <div className="as-card-name">{f.hostelBuildingName || "Floor"}</div>
-                    <div className="as-card-floor">{f.floorNumber}</div>
-                    <div className="as-card-meta"><FaBed /> Click to view rooms</div>
+            {/* Level 1: Buildings */}
+            {!selectedBuilding && (
+              <>
+                <div className="as-top">
+                  <button
+                    type="button"
+                    className="as-add-btn"
+                    onClick={() => {
+                      setOpenBuilding(true);
+                      setEditBuilding(null);
+                      setBuildingForm({ buildingName: "" });
+                    }}
+                  >
+                    Add Building
+                  </button>
+                </div>
+                <div className="as-board">
+                  <div className="as-grid">
+                    {buildings.map((b) => (
+                      <div
+                        key={b.id}
+                        className="as-card as-card-btn"
+                        onClick={() => setSelectedBuilding(b)}
+                      >
+                        <div className="as-card-actions">
+                          <button
+                            type="button"
+                            className="as-ico-btn edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditBuilding(b);
+                              setBuildingForm({ buildingName: b.buildingName });
+                              setOpenBuilding(true);
+                            }}
+                          >
+                            <FaPen />
+                          </button>
+                          <button
+                            type="button"
+                            className="as-ico-btn del"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteBuilding(b);
+                            }}
+                          >
+                            <FaTrashAlt />
+                          </button>
+                        </div>
+                        <div className="as-card-name">
+                          <FaBuilding style={{ marginRight: 6 }} />
+                          {b.buildingName}
+                        </div>
+                        <div className="as-card-meta">Click to view floors</div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
+                </div>
+              </>
+            )}
 
-        {section === "rooms" && selectedFloor && (
-          <>
-            <div className="as-top">
-              <button type="button" className="as-add-btn" onClick={() => { setOpenRoom(true); setEditRoom(null); setRoomForm({ roomNumber: "", roomType: "AC", totalBeds: "" }); }}>
-                Add Room
-              </button>
-            </div>
-            <div className="as-board">
-              <div className="as-floor-no">{selectedFloor.hostelBuildingName} — {selectedFloor.floorNumber}</div>
-              <div className="as-grid">
-                {rooms.map((r) => (
-                  <div key={r.id} className={r.roomType === "AC" ? "as-room ac" : "as-room nonac"}>
-                    <div className="as-room-actions">
-                      <button
-                        type="button"
-                        className="as-ico-btn edit"
-                        onClick={() => {
-                          setEditRoom(r);
-                          setRoomForm({
-                            roomNumber: r.roomNumber,
-                            roomType: r.roomType,
-                            totalBeds: r.totalBeds,
-                          });
-                          setOpenRoom(true);
-                        }}
+            {/* Level 2: Floors of selected building */}
+            {selectedBuilding && !selectedFloor && (
+              <>
+                <div className="as-top">
+                  <button
+                    type="button"
+                    className="as-add-btn"
+                    onClick={() => {
+                      setOpenFloor(true);
+                      setEditFloor(null);
+                      setFloorForm({ floorNumber: "" });
+                    }}
+                  >
+                    Add Floor
+                  </button>
+                </div>
+                <div className="as-board">
+                  <div className="as-floor-no">
+                    Building: <strong>{selectedBuilding.buildingName}</strong>
+                  </div>
+                  <div className="as-grid">
+                    {floors.map((f) => (
+                      <div
+                        key={f.id}
+                        className="as-card as-card-btn"
+                        onClick={() => setSelectedFloor(f)}
                       >
-                        <FaPen />
-                      </button>
-                      <button
-                        type="button"
-                        className="as-ico-btn del"
-                        onClick={() => handleDeleteRoom(r)}
-                      >
-                        <FaTrashAlt />
-                      </button>
-                    </div>
-
-                    <div className="as-room-name">{r.roomNumber}</div>
-                    <div className="as-room-cap">
-                      Capacity: {r.totalBeds} beds — {r.roomType}
-                    </div>
-
-                    {/* ===== Beds List ===== */}
-                    <div className="as-beds-list">
-                      {r.beds && r.beds.length > 0 ? (
-                        r.beds.map((bed) => (
-                          <div key={bed.id} className="as-bed-item">
-                            <span className="as-bed-number">
-                              {bed.bedType === "Double" ? <MdKingBed /> : <FaBed />}{" "}
-                              {bed.bedNumber}
-                            </span>
-                            <span className={`as-bed-status ${bed.status?.toLowerCase()}`}>
-                              {bed.status || "AVAILABLE"}
-                            </span>
-                            <button
-                              type="button"
-                              className="as-ico-btn del"
-                              onClick={() => handleDeleteBed(bed)}
-                              title="Delete Bed"
-                            >
-                              <FaTrashAlt />
-                            </button>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="as-no-beds">No beds added</div>
-                      )}
-                    </div>
-
-                    <button type="button" className="as-plus" onClick={() => openAddBed(r.id)}>
-                      + Add Bed
+                        <div className="as-card-actions">
+                          <button
+                            type="button"
+                            className="as-ico-btn edit"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditFloor(f);
+                              setFloorForm({ floorNumber: f.floorNumber });
+                              setOpenFloor(true);
+                            }}
+                          >
+                            <FaPen />
+                          </button>
+                          <button
+                            type="button"
+                            className="as-ico-btn del"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteFloor(f);
+                            }}
+                          >
+                            <FaTrashAlt />
+                          </button>
+                        </div>
+                        <div className="as-card-floor">{f.floorNumber}</div>
+                        <div className="as-card-meta">
+                          <FaBed /> Click to view rooms
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="as-back-wrap">
+                    <button
+                      type="button"
+                      className="as-add-btn"
+                      onClick={() => {
+                        setSelectedBuilding(null);
+                        setFloors([]);
+                      }}
+                    >
+                      ← Back to Buildings
                     </button>
                   </div>
-                ))}
-              </div>
-              <div className="as-back-wrap">
-                <button type="button" className="as-add-btn" onClick={() => { setSelectedFloor(null); setRooms([]); }}>
-                  Back to Floors
-                </button>
-              </div>
-            </div>
+                </div>
+              </>
+            )}
+
+            {/* Level 3: Rooms + Beds */}
+            {selectedFloor && (
+              <>
+                <div className="as-top">
+                  <button
+                    type="button"
+                    className="as-add-btn"
+                    onClick={() => {
+                      setOpenRoom(true);
+                      setEditRoom(null);
+                      setRoomForm({ roomNumber: "", roomType: "AC", totalBeds: "" });
+                    }}
+                  >
+                    Add Room
+                  </button>
+                </div>
+                <div className="as-board">
+                  <div className="as-floor-no">
+                    {selectedBuilding?.buildingName} — {selectedFloor.floorNumber}
+                  </div>
+                  <div className="as-grid">
+                    {rooms.map((r) => (
+                      <div
+                        key={r.id}
+                        className={r.roomType === "AC" ? "as-room ac" : "as-room nonac"}
+                      >
+                        <div className="as-room-actions">
+                          <button
+                            type="button"
+                            className="as-ico-btn edit"
+                            onClick={() => {
+                              setEditRoom(r);
+                              setRoomForm({
+                                roomNumber: r.roomNumber,
+                                roomType: r.roomType,
+                                totalBeds: r.totalBeds,
+                              });
+                              setOpenRoom(true);
+                            }}
+                          >
+                            <FaPen />
+                          </button>
+                          <button
+                            type="button"
+                            className="as-ico-btn del"
+                            onClick={() => handleDeleteRoom(r)}
+                          >
+                            <FaTrashAlt />
+                          </button>
+                        </div>
+
+                        <div className="as-room-name">{r.roomNumber}</div>
+                        <div className="as-room-cap">
+                          Capacity: {r.totalBeds} beds — {r.roomType}
+                        </div>
+
+                        <div className="as-beds-list">
+                          {r.beds && r.beds.length > 0 ? (
+                            r.beds.map((bed) => (
+                              <div key={bed.id} className="as-bed-item">
+                                <span className="as-bed-number">
+                                  {bed.bedType === "Double" ? <MdKingBed /> : <FaBed />}{" "}
+                                  {bed.bedNumber}
+                                </span>
+                                <span className={`as-bed-status ${bed.status?.toLowerCase()}`}>
+                                  {bed.status || "AVAILABLE"}
+                                </span>
+                                <button
+                                  type="button"
+                                  className="as-ico-btn del"
+                                  onClick={() => handleDeleteBed(bed)}
+                                  title="Delete Bed"
+                                >
+                                  <FaTrashAlt />
+                                </button>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="as-no-beds">No beds added</div>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          className="as-plus"
+                          onClick={() => openAddBed(r.id)}
+                        >
+                          + Add Bed
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="as-back-wrap">
+                    <button
+                      type="button"
+                      className="as-add-btn"
+                      onClick={() => {
+                        setSelectedFloor(null);
+                        setRooms([]);
+                      }}
+                    >
+                      ← Back to Floors
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
 
-        {/* ========== SOURCES ========== */}
-        {/* {section === "sources" && (
-          <div className="as-leave">
-            <div className="as-top">
-              <button type="button" className="as-add-btn" onClick={() => { setOpenSource(true); setEditSource(null); setSourceForm({ source: "" }); }}>
-                Add Source
-              </button>
-            </div>
-            <div className="as-bank-grid">
-              {sources.length === 0 ? (
-                <div className="as-bank-empty">No sources added yet.</div>
-              ) : sources.map((s) => (
-                <div key={s.id} className="as-bank-card">
-                  <div className="as-bank-actions">
-                    <button type="button" className="as-ico-btn edit" onClick={() => { setEditSource(s); setSourceForm({ source: s.source }); setOpenSource(true); }}><FaPen /></button>
-                    <button type="button" className="as-ico-btn del" onClick={() => handleDeleteSource(s)}><FaTrashAlt /></button>
-                  </div>
-                  <div className="as-bank-name">{s.source}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )} */}
-
-        {/* ========== LEAVE (local) ========== */}
-        {/* ========== SOURCES ========== */}
+        {/* ===================== SOURCES ===================== */}
         {section === "sources" && (
           <div className="as-leave">
             <div className="as-top">
@@ -446,39 +645,20 @@ const AdmissionSettings = () => {
                 </thead>
                 <tbody>
                   {sources.length === 0 ? (
-                    <tr >
-                      <td colSpan={2} className="as-leave-empty">
+                    <tr>
+                      <td colSpan={3} className="as-leave-empty">
                         No sources added yet.
                       </td>
                     </tr>
                   ) : (
                     sources.map((s) => (
-                      <tr key={s.id} onClick={() => {
-                        setEditSource(s);
-                        setSourceForm({ source: s.source });
-                        setOpenSource(true);
-                      }}>
-                        <td>
-                          <span>
-                            {s.id}
-                          </span>
-                        </td>
+                      <tr key={s.id}>
+                        <td>{s.id}</td>
                         <td>
                           <span className="as-source-name">{s.source}</span>
                         </td>
                         <td>
                           <div className="as-source-actions">
-                            {/* <button
-                              type="button"
-                              className="as-ico-btn edit"
-                              onClick={() => {
-                                setEditSource(s);
-                                setSourceForm({ source: s.source });
-                                setOpenSource(true);
-                              }}
-                            >
-                              <FaPen />
-                            </button> */}
                             <button
                               type="button"
                               className="as-ico-btn del"
@@ -497,254 +677,425 @@ const AdmissionSettings = () => {
           </div>
         )}
 
-        {/* ========== BANK (local) ========== */}
+        {/* ===================== BANK ===================== */}
         {section === "bank" && (
           <div className="as-leave">
             <div className="as-top">
-              <button type="button" className="as-add-btn" onClick={() => { setEditBank(null); setBankForm(emptyBank); setBankError(""); setOpenBank(true); }}>Add Bank</button>
+              <button
+                type="button"
+                className="as-add-btn"
+                onClick={() => {
+                  setEditBank(null);
+                  setBankForm(emptyBank);
+                  setBankError("");
+                  setOpenBank(true);
+                }}
+              >
+                Add Bank
+              </button>
             </div>
             <div className="as-bank-grid">
-              {banks.length === 0 ? <div className="as-bank-empty">No banks added yet.</div>
-                : banks.map((b) => (
+              {banks.length === 0 ? (
+                <div className="as-bank-empty">No banks added yet.</div>
+              ) : (
+                banks.map((b) => (
                   <div key={b.id} className="as-bank-card">
                     <div className="as-bank-actions">
-                      <button type="button" className="as-ico-btn edit" onClick={() => { setEditBank(b); setBankForm({ ...b, confirmAccount: b.accountNumber }); setOpenBank(true); }}><FaPen /></button>
-                      <button type="button" className="as-ico-btn del" onClick={() => setBanks((prev) => prev.filter((x) => x.id !== b.id))}><FaTrashAlt /></button>
+                      <button
+                        type="button"
+                        className="as-ico-btn edit"
+                        onClick={() => {
+                          setEditBank(b);
+                          setBankForm({ ...b, confirmAccount: b.accountNumber });
+                          setOpenBank(true);
+                        }}
+                      >
+                        <FaPen />
+                      </button>
+                      <button
+                        type="button"
+                        className="as-ico-btn del"
+                        onClick={() => setBanks((prev) => prev.filter((x) => x.id !== b.id))}
+                      >
+                        <FaTrashAlt />
+                      </button>
                     </div>
                     <div className="as-bank-name">{b.bankName}</div>
-                    <div className="as-bank-row"><span>Account No</span><b>{b.accountNumber}</b></div>
-                    <div className="as-bank-row"><span>IFSC</span><b>{b.ifsc}</b></div>
+                    <div className="as-bank-row">
+                      <span>Account No</span>
+                      <b>{b.accountNumber}</b>
+                    </div>
+                    <div className="as-bank-row">
+                      <span>IFSC</span>
+                      <b>{b.ifsc}</b>
+                    </div>
                   </div>
-                ))}
+                ))
+              )}
             </div>
           </div>
         )}
 
-        {/* ========== RULES (local) ========== */}
+        {/* ===================== RULES ===================== */}
         {section === "rules" && (
           <div className="as-leave">
             <div className="as-top as-rule-top">
-              <input className="as-input as-rule-input" type="text" placeholder="Type hostel rule here..." value={ruleText} onChange={(e) => setRuleText(e.target.value)} />
-              <button type="button" className="as-add-btn" onClick={addRule}>Add Rule</button>
+              <input
+                className="as-input as-rule-input"
+                type="text"
+                placeholder="Type hostel rule here..."
+                value={ruleText}
+                onChange={(e) => setRuleText(e.target.value)}
+              />
+              <button type="button" className="as-add-btn" onClick={addRule}>
+                Add Rule
+              </button>
             </div>
             <div className="as-rule-list">
-              {rules.length === 0 ? <div className="as-bank-empty">No rules added yet.</div>
-                : rules.map((r, i) => (
+              {rules.length === 0 ? (
+                <div className="as-bank-empty">No rules added yet.</div>
+              ) : (
+                rules.map((r, i) => (
                   <div key={r.id} className="as-rule-item">
                     <span className="as-rule-no">{i + 1}.</span>
                     <span className="as-rule-text">{r.text}</span>
-                    <button type="button" className="as-ico-btn del" onClick={() => deleteRule(r.id)}><FaTrashAlt /></button>
+                    <button
+                      type="button"
+                      className="as-ico-btn del"
+                      onClick={() => deleteRule(r.id)}
+                    >
+                      <FaTrashAlt />
+                    </button>
                   </div>
-                ))}
+                ))
+              )}
             </div>
           </div>
         )}
       </section>
 
-      {/* ====== FLOOR MODAL ====== */}
-      {openFloor && (
-        <div className="as-overlay" onClick={() => setOpenFloor(false)}>
-          <form className="as-modal as-modal-sm" onClick={(e) => e.stopPropagation()} onSubmit={saveFloor}>
-            <div className="as-modal-title">{editFloor ? "Edit Floor" : "Add Floor"}</div>
+      {/* ===================== MODALS ===================== */}
+
+      {/* Building Modal */}
+      {openBuilding && (
+        <div className="as-overlay" onClick={() => setOpenBuilding(false)}>
+          <form
+            className="as-modal as-modal-sm"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={saveBuilding}
+          >
+            <div className="as-modal-title">
+              {editBuilding ? "Edit Building" : "Add Building"}
+            </div>
             <div className="as-modal-grid">
-              <input className="as-input" placeholder="Building Name" value={floorForm.hostelBuildingName} onChange={(e) => setFloorForm({ ...floorForm, hostelBuildingName: e.target.value })} />
-              <input className="as-input" placeholder="Floor Number / Name" value={floorForm.floorNumber} onChange={(e) => setFloorForm({ ...floorForm, floorNumber: e.target.value })} />
+              <input
+                className="as-input as-span2"
+                placeholder="Building Name"
+                value={buildingForm.buildingName}
+                onChange={(e) =>
+                  setBuildingForm({ ...buildingForm, buildingName: e.target.value })
+                }
+                required
+              />
               <div className="as-modal-actions">
                 <button type="submit" className="as-save">Save</button>
-                <button type="button" className="as-cancel" onClick={() => setOpenFloor(false)}>Cancel</button>
+                <button
+                  type="button"
+                  className="as-cancel"
+                  onClick={() => setOpenBuilding(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </form>
         </div>
       )}
 
-      {/* ====== ROOM MODAL ====== */}
+      {/* Floor Modal */}
+      {openFloor && (
+        <div className="as-overlay" onClick={() => setOpenFloor(false)}>
+          <form
+            className="as-modal as-modal-sm"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={saveFloor}
+          >
+            <div className="as-modal-title">
+              {editFloor ? "Edit Floor" : "Add Floor"}
+            </div>
+            <div className="as-modal-grid">
+              <input
+                className="as-input as-span2"
+                placeholder="Floor Number / Name"
+                value={floorForm.floorNumber}
+                onChange={(e) =>
+                  setFloorForm({ ...floorForm, floorNumber: e.target.value })
+                }
+                required
+              />
+              <div className="as-modal-actions">
+                <button type="submit" className="as-save">Save</button>
+                <button
+                  type="button"
+                  className="as-cancel"
+                  onClick={() => setOpenFloor(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Room Modal */}
       {openRoom && (
         <div className="as-overlay" onClick={() => setOpenRoom(false)}>
-          <form className="as-modal as-modal-sm" onClick={(e) => e.stopPropagation()} onSubmit={saveRoom}>
-            <div className="as-modal-title">{editRoom ? "Edit Room" : "Add Room"}</div>
+          <form
+            className="as-modal as-modal-sm"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={saveRoom}
+          >
+            <div className="as-modal-title">
+              {editRoom ? "Edit Room" : "Add Room"}
+            </div>
             <div className="as-modal-grid">
-              <input className="as-input" placeholder="Room Number" value={roomForm.roomNumber} onChange={(e) => setRoomForm({ ...roomForm, roomNumber: e.target.value })} />
-              <input className="as-input" type="number" min="1" placeholder="Total Beds" value={roomForm.totalBeds} onChange={(e) => setRoomForm({ ...roomForm, totalBeds: e.target.value })} />
-              <select className="as-input as-span2" value={roomForm.roomType} onChange={(e) => setRoomForm({ ...roomForm, roomType: e.target.value })}>
+              <input
+                className="as-input"
+                placeholder="Room Number"
+                value={roomForm.roomNumber}
+                onChange={(e) =>
+                  setRoomForm({ ...roomForm, roomNumber: e.target.value })
+                }
+                required
+              />
+              <input
+                className="as-input"
+                type="number"
+                min="1"
+                placeholder="Total Beds"
+                value={roomForm.totalBeds}
+                onChange={(e) =>
+                  setRoomForm({ ...roomForm, totalBeds: e.target.value })
+                }
+              />
+              <select
+                className="as-input as-span2"
+                value={roomForm.roomType}
+                onChange={(e) =>
+                  setRoomForm({ ...roomForm, roomType: e.target.value })
+                }
+              >
                 <option value="AC">AC Room</option>
                 <option value="NON_AC">Non-AC Room</option>
               </select>
               <div className="as-modal-actions">
                 <button type="submit" className="as-save">Save</button>
-                <button type="button" className="as-cancel" onClick={() => setOpenRoom(false)}>Cancel</button>
+                <button
+                  type="button"
+                  className="as-cancel"
+                  onClick={() => setOpenRoom(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </form>
         </div>
       )}
 
-      {/* ====== BED MODAL ====== */}
+      {/* Bed Modal */}
       {openBed && (
         <div className="as-overlay" onClick={() => setOpenBed(false)}>
-          <form className="as-modal as-modal-sm" onClick={(e) => e.stopPropagation()} onSubmit={saveBed}>
+          <form
+            className="as-modal as-modal-sm"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={saveBed}
+          >
             <div className="as-modal-title">Add Bed</div>
             <div className="as-modal-grid">
-              <input className="as-input" placeholder="Bed Number" value={bedForm.bedNumber} onChange={(e) => setBedForm({ ...bedForm, bedNumber: e.target.value })} />
-              <select className="as-input" value={bedForm.bedType} onChange={(e) => setBedForm({ ...bedForm, bedType: e.target.value })}>
+              <input
+                className="as-input"
+                placeholder="Bed Number"
+                value={bedForm.bedNumber}
+                onChange={(e) =>
+                  setBedForm({ ...bedForm, bedNumber: e.target.value })
+                }
+                required
+              />
+              <select
+                className="as-input"
+                value={bedForm.bedType}
+                onChange={(e) =>
+                  setBedForm({ ...bedForm, bedType: e.target.value })
+                }
+              >
                 <option value="Single">Single</option>
                 <option value="Double">Double</option>
               </select>
-              <select className="as-input as-span2" value={bedForm.status} onChange={(e) => setBedForm({ ...bedForm, status: e.target.value })}>
+              <select
+                className="as-input as-span2"
+                value={bedForm.status}
+                onChange={(e) =>
+                  setBedForm({ ...bedForm, status: e.target.value })
+                }
+              >
                 <option value="AVAILABLE">Available</option>
                 <option value="OCCUPIED">Occupied</option>
                 <option value="MAINTENANCE">Maintenance</option>
               </select>
               <div className="as-modal-actions">
                 <button type="submit" className="as-save">Save</button>
-                <button type="button" className="as-cancel" onClick={() => setOpenBed(false)}>Cancel</button>
+                <button
+                  type="button"
+                  className="as-cancel"
+                  onClick={() => setOpenBed(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </form>
         </div>
       )}
 
-      {/* ====== SOURCE MODAL ====== */}
-      {/* {openSource && (
+      {/* Source Modal */}
+      {openSource && (
         <div className="as-overlay" onClick={() => setOpenSource(false)}>
-          <form className="as-modal as-modal-sm" onClick={(e) => e.stopPropagation()} onSubmit={saveSource}>
-            <div className="as-modal-title">{editSource ? "Edit Source" : "Add Source"}</div>
-            <div className="as-modal-grid">
-              <input className="as-input as-span2" placeholder="Source Name (e.g. Walk-in)" value={sourceForm.source} onChange={(e) => setSourceForm({ source: e.target.value })} />
-              <div className="as-modal-actions">
-                <button type="submit" className="as-save">Save</button>
-                <button type="button" className="as-cancel" onClick={() => setOpenSource(false)}>Cancel</button>
-              </div>
+          <div className="as-modal as-source-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="as-modal-header">
+              <h3>Select or Add Source</h3>
             </div>
-          </form>
-        </div>
-      )} */}
-      {/* ====== SOURCE MODAL ====== */}
-{openSource && (
-  <div className="as-overlay" onClick={() => setOpenSource(false)}>
-    <div
-      className="as-modal as-source-modal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="as-modal-header">
-        <h3>Select or Add Source</h3>
-      </div>
 
-      <div className="as-source-body">
-        <div className="as-popular-label">Popular Sources</div>
+            <div className="as-source-body">
+              <div className="as-popular-label">Popular Sources</div>
 
-        <div className="as-source-chips">
-          {[
-            { name: "WhatsApp", icon: <FaWhatsapp /> },
-            { name: "YouTube", icon: <FaYoutube /> },
-            { name: "Telegram", icon: <FaTelegram /> },
-            { name: "Reddit", icon: <FaReddit /> },
-            { name: "Instagram", icon: <FaInstagram /> },
-            { name: "Facebook", icon: <FaFacebook /> },
-            { name: "Twitter", icon: <FaTwitter /> },
-            { name: "LinkedIn", icon: <FaLinkedin /> },
-            { name: "Banner", icon: <FaBullhorn /> },
-            { name: "Hoarding", icon: <FaBullhorn /> },
-            { name: "Newspaper", icon: <FaNewspaper /> },
-            { name: "Pamphlet", icon: <FaBookOpen /> },
-            { name: "Direct Walk-in", icon: <FaWalking /> },
-          ].map((item) => (
-            <button
-              key={item.name}
-              type="button"
-              className="as-source-chip"
-              onClick={() => {
-                setSourceForm({ source: item.name });
-                // Auto-save when a popular source is clicked
-                setTimeout(() => {
-                  const fakeEvent = { preventDefault: () => {} };
-                  // Temporarily set form then call save
-                  createSource({ source: item.name })
-                    .then(() => {
-                      loadSources();
+              <div className="as-source-chips">
+                {[
+                  { name: "WhatsApp", icon: <FaWhatsapp /> },
+                  { name: "YouTube", icon: <FaYoutube /> },
+                  { name: "Telegram", icon: <FaTelegram /> },
+                  { name: "Reddit", icon: <FaReddit /> },
+                  { name: "Instagram", icon: <FaInstagram /> },
+                  { name: "Facebook", icon: <FaFacebook /> },
+                  { name: "Twitter", icon: <FaTwitter /> },
+                  { name: "LinkedIn", icon: <FaLinkedin /> },
+                  { name: "Banner", icon: <FaBullhorn /> },
+                  { name: "Hoarding", icon: <FaBullhorn /> },
+                  { name: "Newspaper", icon: <FaNewspaper /> },
+                  { name: "Pamphlet", icon: <FaBookOpen /> },
+                  { name: "Direct Walk-in", icon: <FaWalking /> },
+                ].map((item) => (
+                  <button
+                    key={item.name}
+                    type="button"
+                    className="as-source-chip"
+                    onClick={() => {
+                      createSource({ source: item.name }, role, email)
+                        .then(() => {
+                          loadSources();
+                          setOpenSource(false);
+                          setSourceForm({ source: "" });
+                        })
+                        .catch((err) => alert("Failed: " + (err?.message || err)));
+                    }}
+                  >
+                    <span className="as-chip-icon">{item.icon}</span>
+                    {item.name}
+                  </button>
+                ))}
+              </div>
+
+              <div className="as-or-label">Or Enter Custom Source</div>
+
+              <form onSubmit={saveSource}>
+                <input
+                  className="as-input as-custom-source"
+                  placeholder="Source Name"
+                  value={sourceForm.source}
+                  onChange={(e) => setSourceForm({ source: e.target.value })}
+                  autoFocus
+                />
+                <div className="as-modal-actions as-source-actions">
+                  <button
+                    type="button"
+                    className="as-cancel"
+                    onClick={() => {
                       setOpenSource(false);
                       setEditSource(null);
                       setSourceForm({ source: "" });
-                    })
-                    .catch((err) => alert("Failed: " + err.message));
-                }, 0);
-              }}
-            >
-              <span className="as-chip-icon">{item.icon}</span>
-              {item.name}
-            </button>
-          ))}
-        </div>
-
-        <div className="as-or-label">Or Enter Custom Source</div>
-
-        <form onSubmit={saveSource}>
-          <input
-            className="as-input as-custom-source"
-            placeholder="Source Name"
-            value={sourceForm.source}
-            onChange={(e) => setSourceForm({ source: e.target.value })}
-            autoFocus
-          />
-
-          <div className="as-modal-actions as-source-actions">
-            <button
-              type="button"
-              className="as-cancel"
-              onClick={() => {
-                setOpenSource(false);
-                setEditSource(null);
-                setSourceForm({ source: "" });
-              }}
-            >
-              Cancel
-            </button>
-            <button type="submit" className="as-save">
-              Submit
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-)}
-
-      {/* ====== LEAVE MODAL ====== */}
-      {openLeave && (
-        <div className="as-overlay" onClick={() => setOpenLeave(false)}>
-          <form className="as-modal as-modal-sm" onClick={(e) => e.stopPropagation()} onSubmit={saveLeave}>
-            <div className="as-modal-title">Add Leave</div>
-            <div className="as-modal-grid">
-              <input className="as-input" placeholder="User ID" value={leaveForm.userId} onChange={(e) => setLeaveForm({ ...leaveForm, userId: e.target.value })} />
-              <input className="as-input" placeholder="Student Name" value={leaveForm.name} onChange={(e) => setLeaveForm({ ...leaveForm, name: e.target.value })} />
-              <div><label className="as-lab">From Date</label><input className="as-input" type="date" value={leaveForm.from} onChange={(e) => setLeaveForm({ ...leaveForm, from: e.target.value })} /></div>
-              <div><label className="as-lab">To Date</label><input className="as-input" type="date" value={leaveForm.to} onChange={(e) => setLeaveForm({ ...leaveForm, to: e.target.value })} /></div>
-              <input className="as-input" placeholder="Reason" value={leaveForm.reason} onChange={(e) => setLeaveForm({ ...leaveForm, reason: e.target.value })} />
-              <div className="as-modal-actions">
-                <button type="submit" className="as-save">Save</button>
-                <button type="button" className="as-cancel" onClick={() => setOpenLeave(false)}>Cancel</button>
-              </div>
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="as-save">
+                    Submit
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
         </div>
       )}
 
-      {/* ====== BANK MODAL ====== */}
+      {/* Bank Modal */}
       {openBank && (
         <div className="as-overlay" onClick={() => setOpenBank(false)}>
-          <form className="as-modal as-modal-sm" onClick={(e) => e.stopPropagation()} onSubmit={saveBank}>
-            <div className="as-modal-title">{editBank ? "Edit Bank" : "Add Bank"}</div>
+          <form
+            className="as-modal as-modal-sm"
+            onClick={(e) => e.stopPropagation()}
+            onSubmit={saveBank}
+          >
+            <div className="as-modal-title">
+              {editBank ? "Edit Bank" : "Add Bank"}
+            </div>
             <div className="as-modal-grid">
-              <input className="as-input as-span2" placeholder="Bank Name" value={bankForm.bankName} onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })} />
-              <input className="as-input" placeholder="Account Holder" value={bankForm.accountHolder} onChange={(e) => setBankForm({ ...bankForm, accountHolder: e.target.value })} />
-              <input className="as-input" placeholder="Account Number" value={bankForm.accountNumber} onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })} />
-              <input className="as-input" placeholder="Confirm Account Number" value={bankForm.confirmAccount} onChange={(e) => setBankForm({ ...bankForm, confirmAccount: e.target.value })} />
-              <input className="as-input" placeholder="IFSC Code" value={bankForm.ifsc} onChange={(e) => setBankForm({ ...bankForm, ifsc: e.target.value })} />
-              <input className="as-input" placeholder="Branch" value={bankForm.branch} onChange={(e) => setBankForm({ ...bankForm, branch: e.target.value })} />
+              <input
+                className="as-input as-span2"
+                placeholder="Bank Name"
+                value={bankForm.bankName}
+                onChange={(e) => setBankForm({ ...bankForm, bankName: e.target.value })}
+              />
+              <input
+                className="as-input"
+                placeholder="Account Holder"
+                value={bankForm.accountHolder}
+                onChange={(e) => setBankForm({ ...bankForm, accountHolder: e.target.value })}
+              />
+              <input
+                className="as-input"
+                placeholder="Account Number"
+                value={bankForm.accountNumber}
+                onChange={(e) => setBankForm({ ...bankForm, accountNumber: e.target.value })}
+              />
+              <input
+                className="as-input"
+                placeholder="Confirm Account Number"
+                value={bankForm.confirmAccount}
+                onChange={(e) => setBankForm({ ...bankForm, confirmAccount: e.target.value })}
+              />
+              <input
+                className="as-input"
+                placeholder="IFSC Code"
+                value={bankForm.ifsc}
+                onChange={(e) => setBankForm({ ...bankForm, ifsc: e.target.value })}
+              />
+              <input
+                className="as-input"
+                placeholder="Branch"
+                value={bankForm.branch}
+                onChange={(e) => setBankForm({ ...bankForm, branch: e.target.value })}
+              />
               {bankError && <div className="as-error">{bankError}</div>}
               <div className="as-modal-actions">
                 <button type="submit" className="as-save">Save</button>
-                <button type="button" className="as-cancel" onClick={() => setOpenBank(false)}>Cancel</button>
+                <button
+                  type="button"
+                  className="as-cancel"
+                  onClick={() => setOpenBank(false)}
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </form>

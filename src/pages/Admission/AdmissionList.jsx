@@ -701,16 +701,13 @@ const AdmissionList = () => {
           </div>
 
           {/* BUILDING */}
-
           {/* <div className="al-field">
             <label>Building</label>
-
             <select
               value={buildingFilter}
               onChange={(e) => setBuildingFilter(e.target.value)}
             >
               <option value="All">All Buildings</option>
-
               {buildingOpts.map((b) => (
                 <option key={b} value={b}>
                   {b}
