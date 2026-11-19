@@ -33,8 +33,8 @@ const readLocal = (key, fb) => {
 const AdmissionSettings = () => {
   // Get role & email from your auth (adjust as per your project)
   const role = sessionStorage.getItem("role") || "BRANCH";
-const email = sessionStorage.getItem("email") || "";
-const branchCode = sessionStorage.getItem("branchCode") || "";
+  const email = sessionStorage.getItem("email") || "";
+  const branchCode = sessionStorage.getItem("branchCode") || "";
 
   const [section, setSection] = useState("rooms");
 
@@ -189,11 +189,11 @@ const branchCode = sessionStorage.getItem("branchCode") || "";
   const saveFloor = async (e) => {
     e.preventDefault();
     if (!selectedBuilding) {
-    alert("No building selected!");
-    return;
-  }
+      alert("No building selected!");
+      return;
+    }
 
-  console.log("Creating floor for buildingId:", selectedBuilding.id); // ← check this
+    console.log("Creating floor for buildingId:", selectedBuilding.id); // ← check this
     if (!selectedBuilding) return;
     try {
       if (editFloor) {
@@ -826,7 +826,7 @@ const branchCode = sessionStorage.getItem("branchCode") || "";
             <div className="as-modal-grid">
               <input
                 className="as-input as-span2"
-                placeholder="Floor Number / Name"
+                placeholder="Floor Number"
                 value={floorForm.floorNumber}
                 onChange={(e) =>
                   setFloorForm({ ...floorForm, floorNumber: e.target.value })
